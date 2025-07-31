@@ -1,0 +1,159 @@
+"use client"
+
+import type React from "react"
+
+import { useEffect, useState } from "react"
+import { useRouter, usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import {
+  Menu,
+  Home,
+  Calendar,
+  HeadphonesIcon,
+  FileText,
+  Truck,
+  Building,
+  HelpCircle,
+  Newspaper,
+  LogOut,
+  Settings,
+} from "lucide-react"
+import Link from "next/link"
+import { cn } from "@/lib/utils"
+
+const navigation = [
+  { name: "Dashboard", href: "/dashboard", icon: Home },
+  { name: "Schedule Appointment", href: "/dashboard/schedule", icon: Calendar },
+  { name: "Request Support", href: "/dashboard/support", icon: HeadphonesIcon },
+  { name: "Invoices / Payments", href: "/dashboard/invoices", icon: FileText },
+  { name: "My Fleet", href: "/dashboard/fleet", icon: Truck },
+  { name: "Company Account", href: "/dashboard/account", icon: Building },
+  { name: "FAQ", href: "/dashboard/faq", icon: HelpCircle },
+  { name: "News & Updates", href: "/dashboard/news", icon: Newspaper },
+]
+
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const router = useRouter()
+  const pathname = usePathname()
+  const [user, setUser] = useState<any>(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("tiresdash_logged_in")
+    if (isLoggedIn !== "true") {
+      router.push("/")
+      return
+    }
+
+    const userData = localStorage.getItem("tiresdash_user")
+    if (userData) {
+      setUser(JSON.parse(userData))
+    }
+  }, [router])
+
+  const handleLogout = () => {
+    localStorage.removeItem("tiresdash_logged_in")
+    localStorage.removeItem("tiresdash_user")
+    router.push("/")
+  }
+
+  if (!user) {
+    return <div>Loading...</div>
+  }
+
+  const Sidebar = ({ mobile = false }) => (
+    <div className={cn("flex flex-col h-full", mobile ? "w-full" : "w-64")}>
+      <div className="flex items-center px-6 py-4 border-b">
+        <div className="bg-blue-600 p-2 rounded-lg">
+          <Truck className="h-6 w-6 text-white" />
+        </div>
+        <span className="ml-3 text-xl font-bold text-gray-900">TiresDash</span>
+      </div>
+
+      <nav className="flex-1 px-4 py-4 space-y-1">
+        {navigation.map((item) => {
+          const isActive = pathname === item.href
+          return (
+            <Link
+              key={item.name}
+              href={item.href}
+              onClick={() => mobile && setMobileMenuOpen(false)}
+              className={cn(
+                "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
+                isActive ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+              )}
+            >
+              <item.icon className="mr-3 h-5 w-5" />
+              {item.name}
+            </Link>
+          )
+        })}
+      </nav>
+
+      <div className="border-t p-4 space-y-2">
+        <Link
+          href="/admin"
+          className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-100 hover:text-gray-900"
+        >
+          <Settings className="mr-3 h-5 w-5" />
+          Admin Panel
+        </Link>
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-3 h-5 w-5" />
+          Sign Out
+        </Button>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="flex h-screen bg-gray-50">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:flex lg:flex-shrink-0">
+        <div className="flex flex-col w-64 bg-white border-r border-gray-200">
+          <Sidebar />
+        </div>
+      </div>
+
+      {/* Mobile Sidebar */}
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <Sidebar mobile />
+        </SheetContent>
+      </Sheet>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Menu className="h-6 w-6" />
+              </Button>
+            </SheetTrigger>
+          </Sheet>
+          <div className="flex items-center">
+            <div className="bg-blue-600 p-1.5 rounded">
+              <Truck className="h-5 w-5 text-white" />
+            </div>
+            <span className="ml-2 text-lg font-bold text-gray-900">TiresDash</span>
+          </div>
+          <div className="w-10" /> {/* Spacer for centering */}
+        </div>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto">{children}</main>
+      </div>
+    </div>
+  )
+}
