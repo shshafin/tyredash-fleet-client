@@ -1,48 +1,48 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Plus, Search, Edit, Trash2, Upload, Settings } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus, Search, Edit, Trash2, Upload, Settings } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Vehicle {
-  id: string
-  year: string
-  make: string
-  model: string
-  vin: string
-  licensePlate: string
-  tireSizeFront: string
-  tireSizeRear: string
-  notes: string
+  id: string;
+  year: string;
+  make: string;
+  model: string;
+  vin: string;
+  licensePlate: string;
+  tireSizeFront: string;
+  tireSizeRear: string;
+  notes: string;
 }
 
 export default function FleetPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null)
-  const [formData, setFormData] = useState<Partial<Vehicle>>({})
-  const { toast } = useToast()
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
+  const [formData, setFormData] = useState<Partial<Vehicle>>({});
+  const { toast } = useToast();
 
   useEffect(() => {
-    const savedVehicles = localStorage.getItem("tiresdash_vehicles")
+    const savedVehicles = localStorage.getItem("tiresdash_vehicles");
     if (savedVehicles) {
-      setVehicles(JSON.parse(savedVehicles))
+      setVehicles(JSON.parse(savedVehicles));
     }
-  }, [])
+  }, []);
 
   const saveVehicles = (updatedVehicles: Vehicle[]) => {
-    setVehicles(updatedVehicles)
-    localStorage.setItem("tiresdash_vehicles", JSON.stringify(updatedVehicles))
-  }
+    setVehicles(updatedVehicles);
+    localStorage.setItem("tiresdash_vehicles", JSON.stringify(updatedVehicles));
+  };
 
   const handleAddVehicle = () => {
     if (!formData.year || !formData.make || !formData.model || !formData.vin) {
@@ -50,8 +50,8 @@ export default function FleetPage() {
         title: "Error",
         description: "Please fill in all required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     const newVehicle: Vehicle = {
@@ -64,18 +64,18 @@ export default function FleetPage() {
       tireSizeFront: formData.tireSizeFront || "",
       tireSizeRear: formData.tireSizeRear || "",
       notes: formData.notes || "",
-    }
+    };
 
-    const updatedVehicles = [...vehicles, newVehicle]
-    saveVehicles(updatedVehicles)
-    setFormData({})
-    setIsAddDialogOpen(false)
+    const updatedVehicles = [...vehicles, newVehicle];
+    saveVehicles(updatedVehicles);
+    setFormData({});
+    setIsAddDialogOpen(false);
 
     toast({
       title: "Success",
       description: "Vehicle added successfully",
-    })
-  }
+    });
+  };
 
   const handleEditVehicle = () => {
     if (!editingVehicle || !formData.year || !formData.make || !formData.model || !formData.vin) {
@@ -83,38 +83,38 @@ export default function FleetPage() {
         title: "Error",
         description: "Please fill in all required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    const updatedVehicles = vehicles.map((v) => (v.id === editingVehicle.id ? { ...editingVehicle, ...formData } : v))
-    saveVehicles(updatedVehicles)
-    setEditingVehicle(null)
-    setFormData({})
+    const updatedVehicles = vehicles.map((v) => (v.id === editingVehicle.id ? { ...editingVehicle, ...formData } : v));
+    saveVehicles(updatedVehicles);
+    setEditingVehicle(null);
+    setFormData({});
 
     toast({
       title: "Success",
       description: "Vehicle updated successfully",
-    })
-  }
+    });
+  };
 
   const handleDeleteVehicle = (id: string) => {
-    const updatedVehicles = vehicles.filter((v) => v.id !== id)
-    saveVehicles(updatedVehicles)
+    const updatedVehicles = vehicles.filter((v) => v.id !== id);
+    saveVehicles(updatedVehicles);
 
     toast({
       title: "Success",
       description: "Vehicle deleted successfully",
-    })
-  }
+    });
+  };
 
   const filteredVehicles = vehicles.filter(
     (vehicle) =>
       vehicle.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vehicle.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
       vehicle.licensePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const VehicleForm = () => (
     <div className="grid gap-4">
@@ -200,7 +200,7 @@ export default function FleetPage() {
         />
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
@@ -311,8 +311,8 @@ export default function FleetPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => {
-                                  setEditingVehicle(vehicle)
-                                  setFormData(vehicle)
+                                  setEditingVehicle(vehicle);
+                                  setFormData(vehicle);
                                 }}
                               >
                                 <Edit className="h-4 w-4" />
@@ -327,8 +327,8 @@ export default function FleetPage() {
                                 <Button
                                   variant="outline"
                                   onClick={() => {
-                                    setEditingVehicle(null)
-                                    setFormData({})
+                                    setEditingVehicle(null);
+                                    setFormData({});
                                   }}
                                 >
                                   Cancel
@@ -347,9 +347,9 @@ export default function FleetPage() {
                             <Trash2 className="h-4 w-4" />
                           </Button>
 
-                          <Button variant="outline" size="sm">
+                          {/* <Button variant="outline" size="sm">
                             <Settings className="h-4 w-4" />
-                          </Button>
+                          </Button> */}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -361,5 +361,5 @@ export default function FleetPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
