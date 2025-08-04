@@ -5,6 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
+import { useCreateFleetVehicleMutation } from "@/redux/features/fleet/fleetVehiclesApi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { toast } from "sonner";
 
 interface Vehicle {
   year: string;
@@ -21,6 +24,10 @@ interface VehicleFormPropsTypes {
 }
 
 const VehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
+  // mutation hook for creating a new fleet vehicle
+  const [createFleetVehicle, { isLoading }] = useCreateFleetVehicleMutation();
+
+  // form handling using react-hook-form
   const {
     register,
     handleSubmit,
@@ -43,11 +50,18 @@ const VehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
       // Simulate API call
       console.log("Vehicle data:", data);
       // You can add your API call here
-      alert("Vehicle saved successfully!");
-      reset();
+      // alert("Vehicle saved successfully!");
+      const response = await createFleetVehicle(data).unwrap();
+
+      if (response.success) {
+        toast.success("Vehicle added successfully!");
+        reset();
+        setIsAddDialogOpen(false);
+      }
     } catch (error) {
       console.error("Error saving vehicle:", error);
-      alert("Error saving vehicle. Please try again.");
+      // toast.error("Error saving vehicle. Please try again.");
+      toast.error("Failed to add vehicle. Please check your input and try again.");
     }
   };
 
@@ -170,7 +184,9 @@ const VehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
           <Button onClick={() => setIsAddDialogOpen(false)} variant="outline" type="button">
             Cancel
           </Button>
-          <Button type="submit">Add Vehicle</Button>
+          <Button type="submit">
+            {isLoading ? <AiOutlineLoading3Quarters className="animate-spin" /> : "Add Vehicle"}
+          </Button>
         </div>
       </div>
     </form>

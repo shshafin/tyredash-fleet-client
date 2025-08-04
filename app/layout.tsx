@@ -3,11 +3,11 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import ReduxWrapper from "@/components/ReduxWrapper";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.dev",
+  title: "Fleet Dashboard",
+  description: "A modern fleet management dashboard",
 };
 
 export default function RootLayout({
@@ -27,7 +27,10 @@ html {
         `}</style>
       </head>
       <body>
-        <ReduxWrapper>{children}</ReduxWrapper>
+        <ReduxWrapper>
+          {children}
+          <Toaster richColors duration={3000} />
+        </ReduxWrapper>
       </body>
     </html>
   );
