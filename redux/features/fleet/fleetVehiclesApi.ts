@@ -20,18 +20,21 @@ const fleetVehiclesApi = baseApi.injectEndpoints({
     }),
 
     updateFleetVehicle: builder.mutation({
-      query: (data: {
+      query: ({ id, data }: {
         id: string;
-        year?: string;
-        make?: string;
-        model?: string;
-        vin?: string;
-        licensePlate?: string;
-        tireSize?: string;
-        note?: string;
+        data: {
+          year?: string;
+          make?: string;
+          model?: string;
+          vin?: string;
+          licensePlate?: string;
+          tireSize?: string;
+          note?: string;
+        };
       }) => ({
-        url: `/fleet-vehicles/${data.id}`,
+        url: `/fleet-vehicles/${id}`,
         method: "PATCH",
+        // send data without the id
         body: data,
       }),
       invalidatesTags: ["FleetVehicles"],

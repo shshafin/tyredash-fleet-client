@@ -5,9 +5,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { useCreateFleetVehicleMutation } from "@/redux/features/fleet/fleetVehiclesApi";
+import { useCreateFleetVehicleMutation, useUpdateFleetVehicleMutation } from "@/redux/features/fleet/fleetVehiclesApi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
+import { useEffect } from "react";
 
 interface Vehicle {
   year: string;
@@ -20,18 +21,23 @@ interface Vehicle {
 }
 
 interface VehicleFormPropsTypes {
-  setIsAddDialogOpen: (open: boolean) => void;
+  setIsEditDialogOpen: (open: boolean) => void;
+  id: string;
+  vehicleData: Vehicle;
 }
 
-const AddVehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
+const EditVehicleForm = ({ setIsEditDialogOpen, id, vehicleData }: VehicleFormPropsTypes) => {
   // mutation hook for creating a new fleet vehicle
-  const [createFleetVehicle, { isLoading }] = useCreateFleetVehicleMutation();
+  const [updateFleetVehicle, { isLoading }] = useUpdateFleetVehicleMutation();
+
+  console.log(vehicleData);
 
   // form handling using react-hook-form
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+
     reset,
   } = useForm<Vehicle>({
     defaultValues: {
@@ -45,18 +51,30 @@ const AddVehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
     },
   });
 
+  useEffect(() => {
+    reset({
+      year: vehicleData.year,
+      make: vehicleData.make,
+      model: vehicleData.model,
+      vin: vehicleData.vin,
+      licensePlate: vehicleData.licensePlate,
+      tireSize: vehicleData.tireSize,
+      note: vehicleData.note,
+    });
+  }, [vehicleData, reset]);
+
   const onSubmit = async (data: Vehicle) => {
     try {
       // Simulate API call
       console.log("Vehicle data:", data);
       // You can add your API call here
       // alert("Vehicle saved successfully!");
-      const response = await createFleetVehicle(data).unwrap();
+      const response = await updateFleetVehicle({ id, data }).unwrap();
 
       if (response.success) {
-        toast.success("Vehicle added successfully!");
+        toast.success("Vehicle updated successfully!");
         reset();
-        setIsAddDialogOpen(false);
+        setIsEditDialogOpen(false);
       }
     } catch (error) {
       console.error("Error saving vehicle:", error);
@@ -181,11 +199,18 @@ const AddVehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button onClick={() => setIsAddDialogOpen(false)} variant="outline" type="button">
+          <Button
+            onClick={() => {
+              setIsEditDialogOpen(false);
+              console.log("Cancel button clicked");
+            }}
+            variant="outline"
+            type="button"
+          >
             Cancel
           </Button>
           <Button type="submit">
-            {isLoading ? <AiOutlineLoading3Quarters className="animate-spin" /> : "Add Vehicle"}
+            {isLoading ? <AiOutlineLoading3Quarters className="animate-spin" /> : "Save Vehicle"}
           </Button>
         </div>
       </div>
@@ -193,4 +218,4 @@ const AddVehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
   );
 };
 
-export default AddVehicleForm;
+export default EditVehicleForm;

@@ -13,6 +13,7 @@ import { useState, useMemo } from "react";
 import AddVehicleForm from "./AddVehicleForm";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
+import EditVehicleForm from "./EditVehicleForm";
 
 interface Vehicle {
   id: string;
@@ -22,12 +23,13 @@ interface Vehicle {
   vin: string;
   licensePlate: string;
   tireSize: string;
-  notes: string;
+  note: string;
 }
 
 export default function FleetPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [formData, setFormData] = useState<Partial<Vehicle>>({});
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,6 +113,12 @@ export default function FleetPage() {
   const handleDeleteClick = (vehicle: Vehicle) => {
     setVehicleToDelete(vehicle);
     setDeleteConfirmOpen(true);
+  };
+
+  // Handle edit click
+  const handleEditClick = (vehicle: Vehicle) => {
+    setEditingVehicle(vehicle);
+    setIsEditDialogOpen(true);
   };
 
   // delete vehicle
@@ -224,7 +232,7 @@ export default function FleetPage() {
                               <p className="font-semibold">
                                 {vehicle.year} {vehicle.make} {vehicle.model}
                               </p>
-                              {vehicle.notes && <p className="text-sm text-gray-500">{vehicle.notes}</p>}
+                              {vehicle.note && <p className="text-sm text-gray-500">{vehicle.note}</p>}
                             </div>
                           </TableCell>
                           <TableCell className="font-mono text-sm">{vehicle.vin}</TableCell>
@@ -240,37 +248,9 @@ export default function FleetPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
-                              <Dialog>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      setEditingVehicle(vehicle);
-                                      setFormData(vehicle);
-                                    }}
-                                  >
-                                    <Edit className="h-4 w-4" />
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-2xl">
-                                  <DialogHeader>
-                                    <DialogTitle>Edit Vehicle</DialogTitle>
-                                  </DialogHeader>
-                                  <div className="flex justify-end gap-2">
-                                    <Button
-                                      variant="outline"
-                                      onClick={() => {
-                                        setEditingVehicle(null);
-                                        setFormData({});
-                                      }}
-                                    >
-                                      Cancel
-                                    </Button>
-                                    <Button>Save Changes</Button>
-                                  </div>
-                                </DialogContent>
-                              </Dialog>
+                              <Button variant="outline" size="sm" onClick={() => handleEditClick(vehicle)}>
+                                <Edit className="h-4 w-4" />
+                              </Button>
 
                               <Button
                                 onClick={() => handleDeleteClick(vehicle)}
@@ -339,6 +319,23 @@ export default function FleetPage() {
           </CardContent>
         </Card>
       )}
+
+      {/* Edit Vehicle Dialog - Moved outside table structure */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-center underline mb-5">Edit Vehicle</DialogTitle>
+          </DialogHeader>
+
+          {editingVehicle && (
+            <EditVehicleForm
+              setIsEditDialogOpen={setIsEditDialogOpen}
+              id={editingVehicle.id as string}
+              vehicleData={editingVehicle}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
