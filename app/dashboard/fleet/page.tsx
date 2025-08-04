@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Edit, Trash2, Upload, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import VehicleForm from "./AddVehicleForm";
 
 interface Vehicle {
   id: string;
@@ -42,39 +43,6 @@ export default function FleetPage() {
   const saveVehicles = (updatedVehicles: Vehicle[]) => {
     setVehicles(updatedVehicles);
     localStorage.setItem("tiresdash_vehicles", JSON.stringify(updatedVehicles));
-  };
-
-  const handleAddVehicle = () => {
-    if (!formData.year || !formData.make || !formData.model || !formData.vin) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newVehicle: Vehicle = {
-      id: Date.now().toString(),
-      year: formData.year || "",
-      make: formData.make || "",
-      model: formData.model || "",
-      vin: formData.vin || "",
-      licensePlate: formData.licensePlate || "",
-      tireSizeFront: formData.tireSizeFront || "",
-      tireSizeRear: formData.tireSizeRear || "",
-      notes: formData.notes || "",
-    };
-
-    const updatedVehicles = [...vehicles, newVehicle];
-    saveVehicles(updatedVehicles);
-    setFormData({});
-    setIsAddDialogOpen(false);
-
-    toast({
-      title: "Success",
-      description: "Vehicle added successfully",
-    });
   };
 
   const handleEditVehicle = () => {
@@ -116,92 +84,6 @@ export default function FleetPage() {
       vehicle.vin.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const VehicleForm = () => (
-    <div className="grid gap-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="year">Year *</Label>
-          <Input
-            id="year"
-            value={formData.year || ""}
-            onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-            placeholder="2024"
-          />
-        </div>
-        <div>
-          <Label htmlFor="make">Make *</Label>
-          <Input
-            id="make"
-            value={formData.make || ""}
-            onChange={(e) => setFormData({ ...formData, make: e.target.value })}
-            placeholder="Ford"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="model">Model *</Label>
-        <Input
-          id="model"
-          value={formData.model || ""}
-          onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-          placeholder="Transit"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="vin">VIN *</Label>
-        <Input
-          id="vin"
-          value={formData.vin || ""}
-          onChange={(e) => setFormData({ ...formData, vin: e.target.value })}
-          placeholder="1FTBW2CM6NKA12345"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="licensePlate">License Plate</Label>
-        <Input
-          id="licensePlate"
-          value={formData.licensePlate || ""}
-          onChange={(e) => setFormData({ ...formData, licensePlate: e.target.value })}
-          placeholder="ABC-1234"
-        />
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="tireSizeFront">Front Tire Size</Label>
-          <Input
-            id="tireSizeFront"
-            value={formData.tireSizeFront || ""}
-            onChange={(e) => setFormData({ ...formData, tireSizeFront: e.target.value })}
-            placeholder="225/75R16"
-          />
-        </div>
-        <div>
-          <Label htmlFor="tireSizeRear">Rear Tire Size</Label>
-          <Input
-            id="tireSizeRear"
-            value={formData.tireSizeRear || ""}
-            onChange={(e) => setFormData({ ...formData, tireSizeRear: e.target.value })}
-            placeholder="225/75R16"
-          />
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="notes">Notes</Label>
-        <Textarea
-          id="notes"
-          value={formData.notes || ""}
-          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-          placeholder="Additional notes about this vehicle"
-        />
-      </div>
-    </div>
-  );
-
   return (
     <div className="p-4 lg:p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -227,13 +109,8 @@ export default function FleetPage() {
               <DialogHeader>
                 <DialogTitle>Add New Vehicle</DialogTitle>
               </DialogHeader>
-              <VehicleForm />
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleAddVehicle}>Add Vehicle</Button>
-              </div>
+              {/* vehicle form */}
+              <VehicleForm setIsAddDialogOpen={setIsAddDialogOpen} />
             </DialogContent>
           </Dialog>
         </div>
@@ -322,7 +199,7 @@ export default function FleetPage() {
                               <DialogHeader>
                                 <DialogTitle>Edit Vehicle</DialogTitle>
                               </DialogHeader>
-                              <VehicleForm />
+                              {/* <VehicleForm /> */}
                               <div className="flex justify-end gap-2">
                                 <Button
                                   variant="outline"
@@ -346,10 +223,6 @@ export default function FleetPage() {
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
-
-                          {/* <Button variant="outline" size="sm">
-                            <Settings className="h-4 w-4" />
-                          </Button> */}
                         </div>
                       </TableCell>
                     </TableRow>

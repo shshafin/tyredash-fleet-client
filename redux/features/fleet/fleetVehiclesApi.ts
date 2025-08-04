@@ -31,7 +31,7 @@ const fleetVehiclesApi = baseApi.injectEndpoints({
         note?: string;
       }) => ({
         url: `/fleet-vehicles/${data.id}`,
-        method: "PUT",
+        method: "PATCH",
         body: data,
       }),
       invalidatesTags: ["FleetVehicles"],
