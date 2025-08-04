@@ -23,7 +23,7 @@ interface VehicleFormPropsTypes {
   setIsAddDialogOpen: (open: boolean) => void;
 }
 
-const VehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
+const AddVehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
   // mutation hook for creating a new fleet vehicle
   const [createFleetVehicle, { isLoading }] = useCreateFleetVehicleMutation();
 
@@ -193,4 +193,4 @@ const VehicleForm = ({ setIsAddDialogOpen }: VehicleFormPropsTypes) => {
   );
 };
 
-export default VehicleForm;
+export default AddVehicleForm;
