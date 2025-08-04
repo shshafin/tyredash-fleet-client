@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { FleetSupportIssueType, FleetSupportPriority } from "@/interface/FleetInterface";
+import { useCreateFleetSupportMutation } from "@/redux/features/fleet/fleetSupportApi";
 import {
   BookOpen,
   Calendar,
@@ -22,7 +22,9 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const quickHelpItems = [
   {
@@ -80,97 +82,67 @@ interface SupportFormData {
   subject: string;
   message: string;
   priority: string;
-  attachments?: FileList;
 }
 
 export default function SupportPage() {
-  const { toast } = useToast();
+  const [createSupportRequestFn, { isLoading: isSubmitting }] = useCreateFleetSupportMutation();
 
+  const [files, setFiles] = useState<File[]>([]);
   const {
     register,
     handleSubmit,
     watch,
     setValue,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<SupportFormData>();
 
   const issueTypes = [...Object.values(FleetSupportIssueType)];
   const priorities = [...Object.values(FleetSupportPriority)];
 
-  const watchedFiles = watch("attachments");
-
   const onSubmit = async (data: SupportFormData) => {
     try {
-      console.log("Form data:", data);
-      console.log("Attachments:", data.attachments);
-
+      const formData = new FormData();
       // Handle file upload here
-      if (data.attachments && data.attachments.length > 0) {
-        console.log("Files to upload:", Array.from(data.attachments));
 
-        // Here you would typically upload files to your server
-        // Example:
-        // const formData = new FormData();
-        // Array.from(data.attachments).forEach((file, index) => {
-        //   formData.append(`file_${index}`, file);
-        // });
-        // await uploadFiles(formData);
+      if (files.length > 0) {
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+      }
+
+      const supportRequestData = {
+        issueType: data.issueType,
+        priority: data.priority,
+        subject: data.subject,
+        message: data.message,
+      };
+
+      console.log(files);
+
+      // append to formData
+      formData.append("data", JSON.stringify(supportRequestData));
+
+      const res = await createSupportRequestFn(formData).unwrap();
+      console.log(res);
+      if (res.success) {
+        toast.success("Support request submitted successfully!");
+        reset();
       }
 
       // Submit support request
       // await submitSupportRequest(data);
 
       // Reset form
-      reset();
-
-      toast({
-        title: "Support request submitted",
-        description: "We'll get back to you within 24 hours.",
-      });
     } catch (error) {
       console.log(error);
-      toast({
-        title: "Error",
-        description: "Failed to submit support request. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to submit support request. Please try again.");
     }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = event.target.files;
-    if (selectedFiles) {
-      // Validate that all files are CSV
-      const csvFiles = Array.from(selectedFiles).filter(
-        (file) => file.name.toLowerCase().endsWith(".csv") || file.type === "text/csv"
-      );
-
-      if (csvFiles.length !== selectedFiles.length) {
-        toast({
-          title: "Invalid file type",
-          description: "Only CSV files are allowed.",
-          variant: "destructive",
-        });
-        // Clear the input
-        event.target.value = "";
-        return;
-      }
-
-      setValue("attachments", selectedFiles, { shouldValidate: true });
-    }
-  };
-
-  const removeFile = (indexToRemove: number) => {
-    if (watchedFiles) {
-      const filesArray = Array.from(watchedFiles);
-      filesArray.splice(indexToRemove, 1);
-
-      // Create new FileList
-      const dt = new DataTransfer();
-      filesArray.forEach((file) => dt.items.add(file));
-      setValue("attachments", dt.files, { shouldValidate: true });
-    }
+    const newFiles = Array.from(event.target.files || []);
+    setFiles(newFiles);
   };
 
   return (
@@ -294,24 +266,15 @@ export default function SupportPage() {
                   </Button>
                 </div>
                 <p className="text-sm text-gray-500 mt-1">Upload CSV files related to your issue</p>
-                {watchedFiles && watchedFiles.length > 0 && (
+                {files && files.length > 0 && (
                   <div className="mt-2">
                     <p className="text-sm font-medium text-gray-700">Selected files:</p>
                     <ul className="text-sm text-gray-600 space-y-1">
-                      {Array.from(watchedFiles).map((file, index) => (
+                      {Array.from(files).map((file, index) => (
                         <li key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
                           <span className="truncate mr-2">
                             {file.name} ({(file.size / 1024).toFixed(1)} KB)
                           </span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeFile(index)}
-                            className="h-6 w-6 p-0 text-gray-500 hover:text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </Button>
                         </li>
                       ))}
                     </ul>
