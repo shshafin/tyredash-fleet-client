@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
 import { useDeleteFleetVehicleMutation, useGetAllFleetVehiclesQuery } from "@/redux/features/fleet/fleetVehiclesApi";
 import { Edit, Plus, Search, Trash2, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -14,6 +13,7 @@ import AddVehicleForm from "./AddVehicleForm";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
 import EditVehicleForm from "./EditVehicleForm";
+import CustomLoader from "@/components/CustomLoader";
 
 interface Vehicle {
   id: string;
@@ -187,7 +187,9 @@ export default function FleetPage() {
 
       {/* Vehicles Table */}
       {isLoadingVehicles ? (
-        <AiOutlineLoading3Quarters className="animate-spin" />
+        <div className="flex items-center justify-center py-8 min-h-[50vh]">
+          <CustomLoader />
+        </div>
       ) : (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
