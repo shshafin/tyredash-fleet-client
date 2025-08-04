@@ -63,4 +63,10 @@ const fleetVehiclesApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useCreateFleetVehicleMutation } = fleetVehiclesApi;
+export const {
+  useCreateFleetVehicleMutation,
+  useUpdateFleetVehicleMutation,
+  useGetAllFleetVehiclesQuery,
+  useGetFleetVehicleByIdQuery,
+  useDeleteFleetVehicleMutation,
+} = fleetVehiclesApi;
