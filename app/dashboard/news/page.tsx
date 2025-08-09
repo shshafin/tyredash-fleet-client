@@ -174,7 +174,9 @@ export default function NewsPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-4">{item.description}</p>
+                  <p className="text-gray-600 mb-4">
+                    {item.description.length > 100 ? item.description.slice(0, 100) + "..." : item.description}
+                  </p>
                   <Button variant="outline" size="sm" onClick={() => handleReadMore(item)}>
                     Read More
                     <ExternalLink className="ml-2 h-4 w-4" />
