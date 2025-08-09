@@ -19,8 +19,7 @@ import {
   Send,
   Shield,
   Upload,
-  Users,
-  X,
+  Users
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
