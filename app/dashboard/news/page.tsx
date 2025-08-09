@@ -3,6 +3,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useGetRecentUpdatesQuery } from "@/redux/features/newsAndUpdates/newsAndUpdatesApi";
 import { ChevronLeft, ChevronRight, ExternalLink, Newspaper, Shield, Star, Truck } from "lucide-react";
 import { useState } from "react";
@@ -30,6 +32,8 @@ interface NewsResponse {
 
 export default function NewsPage() {
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const itemsPerPage = 6;
 
   const { data: newsData, isLoading: newsDataLoading } = useGetRecentUpdatesQuery({
@@ -132,6 +136,16 @@ export default function NewsPage() {
     }
   };
 
+  const handleReadMore = (newsItem: NewsItem) => {
+    setSelectedNews(newsItem);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedNews(null);
+  };
+
   return (
     <div className="p-4 lg:p-8 space-y-6">
       <div>
@@ -161,7 +175,7 @@ export default function NewsPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600 mb-4">{item.description}</p>
-                  <Button variant="outline" size="sm">
+                  <Button variant="outline" size="sm" onClick={() => handleReadMore(item)}>
                     Read More
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </Button>
@@ -190,7 +204,12 @@ export default function NewsPage() {
                     <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
                     <p className="text-gray-600">{item.description}</p>
                   </div>
-                  <Button variant="outline" size="sm" className="shrink-0 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 bg-transparent"
+                    onClick={() => handleReadMore(item)}
+                  >
                     Read More
                     <ExternalLink className="ml-2 h-4 w-4" />
                   </Button>
@@ -262,6 +281,34 @@ export default function NewsPage() {
           </div>
         </CardContent>
       </Card> */}
+
+      {/* News Details Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh]">
+          <DialogHeader>
+            <div className="flex items-center gap-2 mb-2">
+              {selectedNews && (
+                <Badge className={getBadgeColor(selectedNews.badge)}>
+                  {getBadgeIcon(selectedNews.badge)}
+                  <span className="ml-1">{selectedNews.badge}</span>
+                </Badge>
+              )}
+            </div>
+            <DialogTitle className="text-xl font-bold text-left">{selectedNews?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <DialogDescription className="text-base text-gray-700 mb-4">Full Details</DialogDescription>
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="text-gray-600 leading-relaxed whitespace-pre-wrap">{selectedNews?.description}</div>
+            </ScrollArea>
+          </div>
+          <div className="flex justify-end mt-6">
+            <Button variant="outline" onClick={handleCloseModal}>
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
