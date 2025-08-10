@@ -1,23 +1,20 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, HeadphonesIcon } from "lucide-react"
-import { Calendar } from "lucide-react"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, HeadphonesIcon } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<any>(null)
-
-  useEffect(() => {
-    const userData = localStorage.getItem("tiresdash_user")
-    if (userData) {
-      setUser(JSON.parse(userData))
-    }
-  }, [])
-
-  if (!user) return <div>Loading...</div>
+  const user = {
+    name: "John Doe",
+    company: "TiresDash",
+    accountNumber: "123456",
+    fleetRep: { name: "Sarah Johnson", phone: "555-1234" },
+    email: "john.doe@tiresdash.com",
+  };
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
@@ -166,5 +163,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
