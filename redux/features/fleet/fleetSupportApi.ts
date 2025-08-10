@@ -1,4 +1,4 @@
-import { baseApi } from "@/redux/api/baseApi";
+import { baseApi } from "@/redux/baseApi";
 
 const fleetSupportApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({

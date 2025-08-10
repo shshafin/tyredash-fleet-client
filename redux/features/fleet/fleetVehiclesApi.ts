@@ -1,4 +1,4 @@
-import { baseApi } from "@/redux/api/baseApi";
+import { baseApi } from "@/redux/baseApi";
 
 const fleetVehiclesApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -20,7 +20,10 @@ const fleetVehiclesApi = baseApi.injectEndpoints({
     }),
 
     updateFleetVehicle: builder.mutation({
-      query: ({ id, data }: {
+      query: ({
+        id,
+        data,
+      }: {
         id: string;
         data: {
           year?: string;
