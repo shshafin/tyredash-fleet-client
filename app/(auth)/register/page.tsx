@@ -1,26 +1,34 @@
 "use client";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Building2, Car, User, MessageSquare } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { additionalServicesOptions, FleetRegistrationFormData, fleetRegistrationSchema } from "@/lib/validation";
+import { useRegisterMutation } from "@/redux/features/auth/auth.api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Building2, Car, MessageSquare, User } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 const fleetProgramOptions = ["Fleet Sales Specialist", "Store", "Website", "Other"] as const;
 
 export default function FleetRegistrationForm() {
+  const [registerFn, { isLoading }] = useRegisterMutation();
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
     control,
     watch,
-    formState: { errors, isSubmitting },
+    reset,
+    formState: { errors },
   } = useForm<FleetRegistrationFormData>({
     resolver: zodResolver(fleetRegistrationSchema),
     defaultValues: {
@@ -28,20 +36,24 @@ export default function FleetRegistrationForm() {
       centralLocation: false,
       preferredLocation: false,
       additionalServices: [],
-      phoneExtension: "",
       AdditionalComments: "",
     },
   });
 
-  const watchedAdditionalServices = watch("additionalServices") || [];
+  watch("additionalServices") || [];
 
   const onSubmit = async (data: FleetRegistrationFormData) => {
     try {
-      console.log("Form submitted:", data);
-      // Handle form submission here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-    } catch (error) {
+      const response = await registerFn(data).unwrap();
+
+      if (response.success) {
+        toast.success("Registration successful!");
+        reset();
+        router.push("/login");
+      }
+    } catch (error: any) {
       console.error("Submission error:", error);
+      toast.error(error.data.message || "Something went wrong. Try again");
     }
   };
 
@@ -68,23 +80,23 @@ export default function FleetRegistrationForm() {
                   <div className="space-y-2">
                     <Label htmlFor="businessName">Business Name *</Label>
                     <Input
-                      id="businessName"
-                      {...register("businessName")}
-                      className={errors.businessName ? "border-red-500" : ""}
+                      id="buisnessName"
+                      {...register("buisnessName")}
+                      className={errors.buisnessName ? "border-red-500" : ""}
                     />
-                    {errors.businessName && <p className="text-sm text-red-500">{errors.businessName.message}</p>}
+                    {errors.buisnessName && <p className="text-sm text-red-500">{errors.buisnessName.message}</p>}
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="numberOfBusinessYear">Years in Business *</Label>
+                    <Label htmlFor="numberOfbuisnessYear">Years in Business *</Label>
                     <Input
-                      id="numberOfBusinessYear"
+                      id="numberOfbuisnessYear"
                       type="number"
-                      {...register("numberOfBusinessYear")}
-                      className={errors.numberOfBusinessYear ? "border-red-500" : ""}
+                      {...register("numberOfbuisnessYear")}
+                      className={errors.numberOfbuisnessYear ? "border-red-500" : ""}
                     />
-                    {errors.numberOfBusinessYear && (
-                      <p className="text-sm text-red-500">{errors.numberOfBusinessYear.message}</p>
+                    {errors.numberOfbuisnessYear && (
+                      <p className="text-sm text-red-500">{errors.numberOfbuisnessYear.message}</p>
                     )}
                   </div>
 
@@ -262,7 +274,7 @@ export default function FleetRegistrationForm() {
                         {...register("phone")}
                         className={errors.phone ? "border-red-500" : ""}
                       />
-                      <Input placeholder="Ext." {...register("phoneExtension")} className="w-20" />
+                      {/* <Input placeholder="Ext." {...register("phoneExtension")} className="w-20" /> */}
                     </div>
                     {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
                   </div>
@@ -311,12 +323,21 @@ export default function FleetRegistrationForm() {
                 </div>
               </div>
 
-              <div className="flex justify-center pt-6">
-                <Button type="submit" size="lg" className="px-12" disabled={isSubmitting}>
-                  {isSubmitting ? "Registering..." : "Register Fleet"}
+              <div className="flex justify-center ">
+                <Button type="submit" size="lg" className=" w-full" disabled={isLoading}>
+                  {isLoading ? "Registering..." : "Register Fleet"}
                 </Button>
               </div>
             </form>
+
+            <div>
+              <p className="text-sm text-center text-gray-600 mt-4">
+                Already have an account?{" "}
+                <Link href="/login" className="text-blue-600 underline">
+                  Login
+                </Link>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

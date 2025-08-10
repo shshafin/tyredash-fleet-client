@@ -10,7 +10,7 @@ const additionalServicesOptions = [
 
 export const createFleetUserZodSchema = z.object({
   body: z.object({
-    businessName: z
+    buisnessName: z
       .string({
         required_error: "Business name is required",
       })
@@ -25,7 +25,7 @@ export const createFleetUserZodSchema = z.object({
         required_error: "City is required",
       })
       .min(1, "City is required"),
-    numberOfBusinessYear: z
+    numberOfbuisnessYear: z
       .string({
         required_error: "Number of business years is required",
       })
