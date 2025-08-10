@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { useRouter, usePathname } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   Menu,
   Home,
@@ -18,9 +18,9 @@ import {
   Newspaper,
   LogOut,
   Settings,
-} from "lucide-react"
-import Link from "next/link"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -31,40 +31,36 @@ const navigation = [
   { name: "Company Account", href: "/dashboard/account", icon: Building },
   { name: "FAQ", href: "/dashboard/faq", icon: HelpCircle },
   { name: "News & Updates", href: "/dashboard/news", icon: Newspaper },
-]
+];
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const [user, setUser] = useState<any>(null)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [user, setUser] = useState<any>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("tiresdash_logged_in")
+    const isLoggedIn = localStorage.getItem("tiresdash_logged_in");
     if (isLoggedIn !== "true") {
-      router.push("/")
-      return
+      router.push("/");
+      return;
     }
 
-    const userData = localStorage.getItem("tiresdash_user")
+    const userData = localStorage.getItem("tiresdash_user");
     if (userData) {
-      setUser(JSON.parse(userData))
+      setUser(JSON.parse(userData));
     }
-  }, [router])
+  }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem("tiresdash_logged_in")
-    localStorage.removeItem("tiresdash_user")
-    router.push("/")
-  }
+    localStorage.removeItem("tiresdash_logged_in");
+    localStorage.removeItem("tiresdash_user");
+    router.push("/");
+  };
 
-  if (!user) {
-    return <div>Loading...</div>
-  }
+  // if (!user) {
+  //   return <div>Loading...</div>
+  // }
 
   const Sidebar = ({ mobile = false }) => (
     <div className={cn("flex flex-col h-full", mobile ? "w-full" : "w-64")}>
@@ -77,7 +73,7 @@ export default function DashboardLayout({
 
       <nav className="flex-1 px-4 py-4 space-y-1">
         {navigation.map((item) => {
-          const isActive = pathname === item.href
+          const isActive = pathname === item.href;
           return (
             <Link
               key={item.name}
@@ -85,13 +81,13 @@ export default function DashboardLayout({
               onClick={() => mobile && setMobileMenuOpen(false)}
               className={cn(
                 "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                isActive ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+                isActive ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               )}
             >
               <item.icon className="mr-3 h-5 w-5" />
               {item.name}
             </Link>
-          )
+          );
         })}
       </nav>
 
@@ -113,7 +109,7 @@ export default function DashboardLayout({
         </Button>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -155,5 +151,5 @@ export default function DashboardLayout({
         <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
-  )
+  );
 }

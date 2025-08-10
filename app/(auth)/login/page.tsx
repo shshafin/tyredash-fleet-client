@@ -9,7 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { Truck, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useState } from "react";
+import { useActionState, useState } from "react";
+import { login } from "./loginFormAction";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -20,7 +22,7 @@ const formSchema = z.object({
 
 export default function FleetLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [state, fromAction] = useActionState(login, { success: false, error: "" });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -29,20 +31,6 @@ export default function FleetLoginPage() {
       password: "",
     },
   });
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    try {
-      // Handle login logic here
-      console.log(values);
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -58,7 +46,7 @@ export default function FleetLoginPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form action={fromAction} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -96,11 +84,19 @@ export default function FleetLoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing In..." : "Sign In"}
+              <Button type="submit" className="w-full">
+                Sign In
               </Button>
             </form>
           </Form>
+
+          {state.error && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{state.error || "Something Went Wrong"}</AlertDescription>
+            </Alert>
+          )}
+
           <Separator className="my-4" />
 
           <div className="text-center">
