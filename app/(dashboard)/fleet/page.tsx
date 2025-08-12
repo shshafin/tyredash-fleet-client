@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useDeleteFleetVehicleMutation, useGetAllFleetVehiclesQuery } from "@/redux/features/fleet/fleetVehiclesApi";
+import { useDeleteFleetVehicleMutation, useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
 import { Edit, Plus, Search, Trash2, Upload, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 import AddVehicleForm from "./AddVehicleForm";

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { useCreateFleetVehicleMutation } from "@/redux/features/fleet/fleetVehiclesApi";
+import { useCreateFleetVehicleMutation } from "@/redux/features/vehicles/fleetVehiclesApi";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { toast } from "sonner";
 
