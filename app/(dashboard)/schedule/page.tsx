@@ -1,42 +1,45 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar, Clock, MapPin, Upload, CheckCircle } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar, Clock, MapPin, Upload, CheckCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
 
 interface Vehicle {
-  id: string
-  year: string
-  make: string
-  model: string
-  licensePlate: string
+  id: string;
+  year: string;
+  make: string;
+  model: string;
+  licensePlate: string;
 }
 
 export default function SchedulePage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([])
-  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([])
-  const [serviceTypes, setServiceTypes] = useState<string[]>([])
-  const [appointmentDate, setAppointmentDate] = useState("")
-  const [appointmentTime, setAppointmentTime] = useState("")
-  const [serviceAddress, setServiceAddress] = useState("")
-  const [notes, setNotes] = useState("")
-  const { toast } = useToast()
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
+  const [serviceTypes, setServiceTypes] = useState<string[]>([]);
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("");
+  const [serviceAddress, setServiceAddress] = useState("");
+  const [notes, setNotes] = useState("");
+  const { toast } = useToast();
+
+  const { data: fleetVehicles } = useGetAllFleetVehiclesQuery({});
 
   const serviceOptions = [
     { id: "tire-replacement", label: "Tire Replacement" },
     { id: "flat-repair", label: "Flat Repair" },
     { id: "balance", label: "Balance" },
     { id: "rotation", label: "Rotation" },
-  ]
+  ];
 
   const timeSlots = [
     "8:00 AM",
@@ -48,41 +51,41 @@ export default function SchedulePage() {
     "2:00 PM",
     "3:00 PM",
     "4:00 PM",
-  ]
+  ];
 
   useEffect(() => {
-    const savedVehicles = localStorage.getItem("tiresdash_vehicles")
+    const savedVehicles = localStorage.getItem("tiresdash_vehicles");
     if (savedVehicles) {
-      setVehicles(JSON.parse(savedVehicles))
+      setVehicles(JSON.parse(savedVehicles));
     }
-  }, [])
+  }, []);
 
   const handleVehicleSelection = (vehicleId: string, checked: boolean) => {
     if (checked) {
-      setSelectedVehicles([...selectedVehicles, vehicleId])
+      setSelectedVehicles([...selectedVehicles, vehicleId]);
     } else {
-      setSelectedVehicles(selectedVehicles.filter((id) => id !== vehicleId))
+      setSelectedVehicles(selectedVehicles.filter((id) => id !== vehicleId));
     }
-  }
+  };
 
   const handleServiceTypeChange = (serviceId: string, checked: boolean) => {
     if (checked) {
-      setServiceTypes([...serviceTypes, serviceId])
+      setServiceTypes([...serviceTypes, serviceId]);
     } else {
-      setServiceTypes(serviceTypes.filter((id) => id !== serviceId))
+      setServiceTypes(serviceTypes.filter((id) => id !== serviceId));
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (selectedVehicles.length === 0) {
       toast({
         title: "Error",
         description: "Please select at least one vehicle",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     if (serviceTypes.length === 0) {
@@ -90,8 +93,8 @@ export default function SchedulePage() {
         title: "Error",
         description: "Please select at least one service type",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     if (!appointmentDate || !appointmentTime || !serviceAddress) {
@@ -99,12 +102,12 @@ export default function SchedulePage() {
         title: "Error",
         description: "Please fill in all required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     // Save appointment to localStorage
-    const appointments = JSON.parse(localStorage.getItem("tiresdash_appointments") || "[]")
+    const appointments = JSON.parse(localStorage.getItem("tiresdash_appointments") || "[]");
     const newAppointment = {
       id: Date.now().toString(),
       vehicles: selectedVehicles,
@@ -115,18 +118,18 @@ export default function SchedulePage() {
       notes,
       status: "Scheduled",
       createdAt: new Date().toISOString(),
-    }
+    };
 
-    appointments.push(newAppointment)
-    localStorage.setItem("tiresdash_appointments", JSON.stringify(appointments))
+    appointments.push(newAppointment);
+    localStorage.setItem("tiresdash_appointments", JSON.stringify(appointments));
 
     // Reset form
-    setSelectedVehicles([])
-    setServiceTypes([])
-    setAppointmentDate("")
-    setAppointmentTime("")
-    setServiceAddress("")
-    setNotes("")
+    setSelectedVehicles([]);
+    setServiceTypes([]);
+    setAppointmentDate("");
+    setAppointmentTime("");
+    setServiceAddress("");
+    setNotes("");
 
     toast({
       title: "Success",
@@ -137,8 +140,8 @@ export default function SchedulePage() {
           <span>Scheduled</span>
         </div>
       ),
-    })
-  }
+    });
+  };
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
@@ -307,5 +310,5 @@ export default function SchedulePage() {
         </div>
       </form>
     </div>
-  )
+  );
 }

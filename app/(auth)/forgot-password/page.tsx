@@ -1,23 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ArrowLeft, Truck } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft, Truck } from "lucide-react";
+import Link from "next/link";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [email, setEmail] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitted(true)
-  }
+    e.preventDefault();
+    setIsSubmitted(true);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
               <Truck className="h-8 w-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Reset Password</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-900">Forgot Password?</CardTitle>
           <p className="text-gray-600">
             {isSubmitted ? "Check your email for reset instructions" : "Enter your email to reset your password"}
           </p>
@@ -69,5 +69,5 @@ export default function ForgotPasswordPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
