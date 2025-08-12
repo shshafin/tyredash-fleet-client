@@ -23,14 +23,14 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: Home },
-  { name: "Schedule Appointment", href: "/dashboard/schedule", icon: Calendar },
-  { name: "Request Support", href: "/dashboard/support", icon: HeadphonesIcon },
-  { name: "Invoices / Payments", href: "/dashboard/invoices", icon: FileText },
-  { name: "My Fleet", href: "/dashboard/fleet", icon: Truck },
-  { name: "Company Account", href: "/dashboard/account", icon: Building },
-  { name: "FAQ", href: "/dashboard/faq", icon: HelpCircle },
-  { name: "News & Updates", href: "/dashboard/news", icon: Newspaper },
+  { name: "Dashboard", href: "/", icon: Home },
+  { name: "Schedule Appointment", href: "/schedule", icon: Calendar },
+  { name: "Request Support", href: "/support", icon: HeadphonesIcon },
+  { name: "Invoices / Payments", href: "/invoices", icon: FileText },
+  { name: "My Fleet", href: "/fleet", icon: Truck },
+  { name: "Company Account", href: "/account", icon: Building },
+  { name: "FAQ", href: "/faq", icon: HelpCircle },
+  { name: "News & Updates", href: "/news", icon: Newspaper },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {

@@ -12,6 +12,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useActionState, useState } from "react";
 import { login } from "./loginFormAction";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useLoginMutation } from "@/redux/features/auth/auth.api";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({
@@ -22,7 +24,9 @@ const formSchema = z.object({
 
 export default function FleetLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [state, fromAction] = useActionState(login, { success: false, error: "" });
+  const [loginFn, { isLoading, error }] = useLoginMutation();
+  // const [state, fromAction] = useActionState(login, { success: false, error: "" });
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -31,6 +35,18 @@ export default function FleetLoginPage() {
       password: "",
     },
   });
+
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log(data);
+    try {
+      const res = await loginFn(data).unwrap();
+      if (res.success) {
+        router.push("/");
+      }
+    } catch (error) {}
+  };
+
+  // console.log(error);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -46,7 +62,7 @@ export default function FleetLoginPage() {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form action={fromAction} className="space-y-4">
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -90,10 +106,16 @@ export default function FleetLoginPage() {
             </form>
           </Form>
 
-          {state.error && (
+          {error && (
             <Alert variant="destructive" className="mt-4">
               <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{state.error || "Something Went Wrong"}</AlertDescription>
+              <AlertDescription>
+                {"data" in error && error.data && typeof error.data === "object" && "message" in error.data
+                  ? (error.data as { message?: string }).message === "password mismatch"
+                    ? "Invalid email or password"
+                    : "Something Went Wrong"
+                  : "Something Went Wrong"}
+              </AlertDescription>
             </Alert>
           )}
 
