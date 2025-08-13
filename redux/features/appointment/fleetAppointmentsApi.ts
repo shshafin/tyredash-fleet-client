@@ -52,3 +52,11 @@ const fleetAppointmentsApi = baseApi.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useCreateFleetAppointmentMutation,
+  useGetFleetAppointmentsQuery,
+  useGetFleetAppointmentByIdQuery,
+  useUpdateFleetAppointmentMutation,
+  useDeleteFleetAppointmentMutation,
+} = fleetAppointmentsApi;

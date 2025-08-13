@@ -1,45 +1,58 @@
 "use client";
 
 import type React from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useState } from "react";
 
-import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, Clock, MapPin, Upload, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
+import { Textarea } from "@/components/ui/textarea";
+import { IVehicle, ServiceType } from "@/constants/fleet.types";
 
-interface Vehicle {
-  id: string;
-  year: string;
-  make: string;
-  model: string;
-  licensePlate: string;
-}
+import { useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
+import { Calendar, CheckCircle, Clock, MapPin, Upload, X } from "lucide-react";
+import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
+import { useCreateFleetAppointmentMutation } from "@/redux/features/appointment/fleetAppointmentsApi";
+import { toast } from "sonner";
+
+// Validation schema
+const appointmentSchema = z.object({
+  selectedVehicle: z.string().min(1, "Please select a vehicle"),
+  serviceType: z.string().min(1, "Please select a service type"),
+  appointmentDate: z.string().min(1, "Please select a date"),
+  appointmentTime: z.string().min(1, "Please select a time"),
+  serviceAddress: z.string().min(1, "Please enter a service address"),
+  notes: z.string().optional(),
+});
+
+type AppointmentFormData = z.infer<typeof appointmentSchema>;
 
 export default function SchedulePage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
-  const [serviceTypes, setServiceTypes] = useState<string[]>([]);
-  const [appointmentDate, setAppointmentDate] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("");
-  const [serviceAddress, setServiceAddress] = useState("");
-  const [notes, setNotes] = useState("");
-  const { toast } = useToast();
+  const { data: fleetVehicles, isLoading: fleetDataLoading } = useGetAllFleetVehiclesQuery({});
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [createFleetAppointmentFn, { isLoading: fleetLoading }] = useCreateFleetAppointmentMutation();
 
-  const { data: fleetVehicles } = useGetAllFleetVehiclesQuery({});
-
-  const serviceOptions = [
-    { id: "tire-replacement", label: "Tire Replacement" },
-    { id: "flat-repair", label: "Flat Repair" },
-    { id: "balance", label: "Balance" },
-    { id: "rotation", label: "Rotation" },
-  ];
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AppointmentFormData>({
+    resolver: zodResolver(appointmentSchema),
+    defaultValues: {
+      selectedVehicle: "",
+      serviceType: "",
+      appointmentDate: "",
+      appointmentTime: "",
+      serviceAddress: "",
+      notes: "",
+    },
+  });
 
   const timeSlots = [
     "8:00 AM",
@@ -53,94 +66,58 @@ export default function SchedulePage() {
     "4:00 PM",
   ];
 
-  useEffect(() => {
-    const savedVehicles = localStorage.getItem("tiresdash_vehicles");
-    if (savedVehicles) {
-      setVehicles(JSON.parse(savedVehicles));
-    }
-  }, []);
-
-  const handleVehicleSelection = (vehicleId: string, checked: boolean) => {
-    if (checked) {
-      setSelectedVehicles([...selectedVehicles, vehicleId]);
-    } else {
-      setSelectedVehicles(selectedVehicles.filter((id) => id !== vehicleId));
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
     }
   };
 
-  const handleServiceTypeChange = (serviceId: string, checked: boolean) => {
-    if (checked) {
-      setServiceTypes([...serviceTypes, serviceId]);
-    } else {
-      setServiceTypes(serviceTypes.filter((id) => id !== serviceId));
+  const removeFile = () => {
+    setSelectedFile(null);
+    // Reset the file input
+    const fileInput = document.getElementById("file-upload") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = "";
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: z.infer<typeof appointmentSchema>) => {
+    // Create FormData object
+    const formData = new FormData();
 
-    if (selectedVehicles.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one vehicle",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (serviceTypes.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one service type",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!appointmentDate || !appointmentTime || !serviceAddress) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Save appointment to localStorage
-    const appointments = JSON.parse(localStorage.getItem("tiresdash_appointments") || "[]");
-    const newAppointment = {
-      id: Date.now().toString(),
-      vehicles: selectedVehicles,
-      serviceTypes,
-      date: appointmentDate,
-      time: appointmentTime,
-      address: serviceAddress,
-      notes,
-      status: "Scheduled",
-      createdAt: new Date().toISOString(),
+    const dataToSubmit = {
+      fleetVehicle: data.selectedVehicle,
+      serviceType: data.serviceType,
+      date: data.appointmentDate,
+      time: data.appointmentTime,
+      address: data.serviceAddress,
+      notes: data.notes,
     };
 
-    appointments.push(newAppointment);
-    localStorage.setItem("tiresdash_appointments", JSON.stringify(appointments));
+    formData.append("data", JSON.stringify(dataToSubmit));
 
-    // Reset form
-    setSelectedVehicles([]);
-    setServiceTypes([]);
-    setAppointmentDate("");
-    setAppointmentTime("");
-    setServiceAddress("");
-    setNotes("");
+    console.log(selectedFile);
 
-    toast({
-      title: "Success",
-      description: "Appointment scheduled successfully!",
-      action: (
-        <div className="flex items-center">
-          <CheckCircle className="h-4 w-4 text-green-600 mr-1" />
-          <span>Scheduled</span>
-        </div>
-      ),
-    });
+    // Append file if selected
+    if (selectedFile) {
+      formData.append("files", selectedFile);
+    }
+
+    try {
+      const res = await createFleetAppointmentFn(formData).unwrap();
+
+      if (res.success) {
+        toast.success("Appointment created successfully");
+        reset();
+        setSelectedFile(null);
+      }
+    } catch (error) {
+      toast.error("Failed to create appointment");
+    }
+
+    // You can now send formData to your API
+    // Example: await fetch('/api/appointments', { method: 'POST', body: formData });
   };
 
   return (
@@ -150,37 +127,44 @@ export default function SchedulePage() {
         <p className="text-gray-600">Book tire services for your fleet vehicles</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* Vehicle Selection */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Calendar className="mr-2 h-5 w-5" />
-              Select Vehicles
+              Select Vehicle
             </CardTitle>
           </CardHeader>
           <CardContent>
-            {vehicles.length === 0 ? (
+            {fleetDataLoading ? (
+              "Loading..."
+            ) : fleetVehicles?.data?.length === 0 ? (
               <p className="text-gray-500">No vehicles found. Please add vehicles to your fleet first.</p>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {vehicles.map((vehicle) => (
-                  <div key={vehicle.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                    <Checkbox
-                      id={vehicle.id}
-                      checked={selectedVehicles.includes(vehicle.id)}
-                      onCheckedChange={(checked) => handleVehicleSelection(vehicle.id, checked as boolean)}
-                    />
-                    <Label htmlFor={vehicle.id} className="flex-1 cursor-pointer">
-                      <div>
-                        <p className="font-semibold">
-                          {vehicle.year} {vehicle.make} {vehicle.model}
-                        </p>
-                        <p className="text-sm text-gray-500">{vehicle.licensePlate}</p>
-                      </div>
-                    </Label>
-                  </div>
-                ))}
+              <div className="space-y-2">
+                <Controller
+                  name="selectedVehicle"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a Vehicle" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Vehicles</SelectLabel>
+                          {fleetVehicles?.data?.map((vehicle: IVehicle) => (
+                            <SelectItem key={vehicle._id} value={vehicle._id}>
+                              {vehicle.year} {vehicle.make} {vehicle.model}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.selectedVehicle && <p className="text-sm text-red-500">{errors.selectedVehicle.message}</p>}
               </div>
             )}
           </CardContent>
@@ -192,19 +176,29 @@ export default function SchedulePage() {
             <CardTitle>Service Type</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {serviceOptions.map((service) => (
-                <div key={service.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                  <Checkbox
-                    id={service.id}
-                    checked={serviceTypes.includes(service.id)}
-                    onCheckedChange={(checked) => handleServiceTypeChange(service.id, checked as boolean)}
-                  />
-                  <Label htmlFor={service.id} className="cursor-pointer">
-                    {service.label}
-                  </Label>
-                </div>
-              ))}
+            <div className="space-y-2">
+              <Controller
+                name="serviceType"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Service Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Service Types</SelectLabel>
+                        {Object.values(ServiceType).map((service) => (
+                          <SelectItem key={service} value={service}>
+                            {service}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                )}
+              />
+              {errors.serviceType && <p className="text-sm text-red-500">{errors.serviceType.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -219,31 +213,38 @@ export default function SchedulePage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="date">Preferred Date *</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={appointmentDate}
-                  onChange={(e) => setAppointmentDate(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]}
-                  required
+                <Controller
+                  name="appointmentDate"
+                  control={control}
+                  render={({ field }) => (
+                    <Input id="date" type="date" min={new Date().toISOString().split("T")[0]} {...field} />
+                  )}
                 />
+                {errors.appointmentDate && <p className="text-sm text-red-500">{errors.appointmentDate.message}</p>}
               </div>
-              <div>
+              <div className="space-y-2">
                 <Label htmlFor="time">Preferred Time *</Label>
-                <Select value={appointmentTime} onValueChange={setAppointmentTime}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {timeSlots.map((time) => (
-                      <SelectItem key={time} value={time}>
-                        {time}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Controller
+                  name="appointmentTime"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlots.map((time) => (
+                          <SelectItem key={time} value={time}>
+                            {time}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.appointmentTime && <p className="text-sm text-red-500">{errors.appointmentTime.message}</p>}
               </div>
             </div>
           </CardContent>
@@ -258,15 +259,16 @@ export default function SchedulePage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="address">Service Address *</Label>
-              <Textarea
-                id="address"
-                placeholder="Enter the address where service should be performed"
-                value={serviceAddress}
-                onChange={(e) => setServiceAddress(e.target.value)}
-                required
+              <Controller
+                name="serviceAddress"
+                control={control}
+                render={({ field }) => (
+                  <Textarea id="address" placeholder="Enter the address where service should be performed" {...field} />
+                )}
               />
+              {errors.serviceAddress && <p className="text-sm text-red-500">{errors.serviceAddress.message}</p>}
             </div>
           </CardContent>
         </Card>
@@ -279,24 +281,41 @@ export default function SchedulePage() {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="notes">Special Instructions or Notes</Label>
-              <Textarea
-                id="notes"
-                placeholder="Any special instructions for the service technician"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+              <Controller
+                name="notes"
+                control={control}
+                render={({ field }) => (
+                  <Textarea id="notes" placeholder="Any special instructions for the service technician" {...field} />
+                )}
               />
             </div>
 
             <div>
               <Label htmlFor="po-upload">Upload PO or Documentation</Label>
-              <div className="mt-2">
-                <Button type="button" variant="outline" className="w-full sm:w-auto bg-transparent">
-                  <Upload className="mr-2 h-4 w-4" />
-                  Choose File
-                </Button>
-                <p className="text-sm text-gray-500 mt-1">
-                  Upload purchase orders, work orders, or other relevant documents
-                </p>
+              <div className="mt-2 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Input id="file-upload" type="file" accept=".csv" onChange={handleFileChange} className="hidden" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full sm:w-auto bg-transparent"
+                    onClick={() => document.getElementById("file-upload")?.click()}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Choose File
+                  </Button>
+                </div>
+
+                {selectedFile && (
+                  <div className="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                    <span className="text-sm text-gray-700">{selectedFile.name}</span>
+                    <Button type="button" variant="ghost" size="sm" onClick={removeFile} className="h-6 w-6 p-0">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+
+                <p className="text-sm text-gray-500">Only CSV files are allowed</p>
               </div>
             </div>
           </CardContent>
