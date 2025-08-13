@@ -6,7 +6,7 @@ import { jwtDecode } from "jwt-decode";
 const AuthRoutes = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
-  const refreshToken = request.cookies.get("refreshToken");
+  const refreshToken = request.cookies.get("accessToken");
   const pathname = request.nextUrl.pathname;
 
   const user: { role: string } | null = refreshToken ? jwtDecode(refreshToken.value) : null;
