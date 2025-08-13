@@ -6,8 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, HeadphonesIcon } from "lucide-react";
 import { Calendar } from "lucide-react";
+import { useGetProfileQuery } from "@/redux/features/user/users.api";
 
 export default function DashboardPage() {
+  const { data: userProfile } = useGetProfileQuery({});
+
+  console.log("profileData:", userProfile?.data);
+
   const user = {
     name: "John Doe",
     company: "TiresDash",

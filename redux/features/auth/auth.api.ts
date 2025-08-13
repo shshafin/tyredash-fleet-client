@@ -16,7 +16,14 @@ const authApi = baseApi.injectEndpoints({
         body: data,
       }),
     }),
+
+    logout: builder.mutation({
+      query: () => ({
+        url: "/fleet-auth/logout",
+        method: "POST",
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation } = authApi;
+export const { useRegisterMutation, useLoginMutation, useLogoutMutation } = authApi;
