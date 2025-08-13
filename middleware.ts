@@ -1,39 +1,50 @@
 import { NextResponse, NextRequest } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
-// This function can be marked `async` if using `await` inside
-
 const AuthRoutes = ["/login", "/register"];
 
 export function middleware(request: NextRequest) {
-  const refreshToken = request.cookies.get("accessToken");
+  const accessToken = request.cookies.get("accessToken"); // Fixed variable name
   const pathname = request.nextUrl.pathname;
 
-  const user: { role: string } | null = refreshToken ? jwtDecode(refreshToken.value) : null;
+  console.log("Pathname:", pathname);
+  console.log("Access Token exists:", !!accessToken);
 
-  console.log(user);
-
-  if (!refreshToken || user?.role !== "fleet_user") {
+  if (!accessToken) {
+    console.log("No access token found");
     if (AuthRoutes.includes(pathname)) {
       return NextResponse.next();
     } else {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
-  return NextResponse.next();
+
+  try {
+    const user: { role: string } | null = jwtDecode(accessToken.value);
+    console.log("Decoded user:", user);
+    console.log("User role:", user?.role);
+
+    if (user?.role !== "fleet_user") {
+      console.log("Invalid role, redirecting to login");
+      if (AuthRoutes.includes(pathname)) {
+        return NextResponse.next();
+      } else {
+        return NextResponse.redirect(new URL("/login", request.url));
+      }
+    }
+
+    console.log("Valid user, allowing access");
+    return NextResponse.next();
+  } catch (error) {
+    console.log("JWT decode error:", error);
+    if (AuthRoutes.includes(pathname)) {
+      return NextResponse.next();
+    } else {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
 }
 
 export const config = {
-  // Exclude static assets, API routes, and Next.js internals
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - *.extension (static files with extensions)
-     */
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)"],
 };

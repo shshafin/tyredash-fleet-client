@@ -33,33 +33,8 @@ const navigation = [
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    const isLoggedIn = localStorage.getItem("tiresdash_logged_in");
-    if (isLoggedIn !== "true") {
-      router.push("/");
-      return;
-    }
-
-    const userData = localStorage.getItem("tiresdash_user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("tiresdash_logged_in");
-    localStorage.removeItem("tiresdash_user");
-    router.push("/");
-  };
-
-  // if (!user) {
-  //   return <div>Loading...</div>
-  // }
 
   const Sidebar = ({ mobile = false }) => (
     <div className={cn("flex flex-col h-full", mobile ? "w-full" : "w-64")}>
@@ -91,11 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </nav>
 
       <div className="border-t p-4 space-y-2">
-        <Button
-          variant="ghost"
-          className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
-          onClick={handleLogout}
-        >
+        <Button variant="ghost" className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50">
           <LogOut className="mr-3 h-5 w-5" />
           Sign Out
         </Button>
