@@ -4,7 +4,7 @@ const newAndUpdateAPi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getRecentUpdates: builder.query({
       query: (params = {}) => ({
-        url: "/fleet-news/",
+        url: "/fleet-news",
         method: "GET",
         params: {
           page: params.page || 1,

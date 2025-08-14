@@ -4,21 +4,73 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, HeadphonesIcon } from "lucide-react";
 import { Calendar } from "lucide-react";
-import { useGetProfileQuery } from "@/redux/features/user/users.api";
+import { useMyProfileQuery } from "@/redux/features/user/usersApi";
 
 export default function DashboardPage() {
-  const { data: userProfile } = useGetProfileQuery({});
+  const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery({});
 
   console.log("profileData:", userProfile?.data);
 
+  // If loading, show loading state
+  if (profileDataLoading) {
+    return (
+      <div className="p-4 lg:p-8 space-y-6">
+        <div className="bg-white rounded-lg border p-6">
+          <Skeleton className="h-8 w-64 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+          {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-10 w-full" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // If error, show error message
+  if (error) {
+    return (
+      <div className="p-4 lg:p-8">
+        <Card className="border-red-200">
+          <CardContent className="p-6 text-center">
+            <p className="text-red-600">Failed to load profile data. Please refresh the page.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const userData = userProfile?.data;
+
+  // Construct user object from API data
   const user = {
-    name: "John Doe",
-    company: "TiresDash",
-    accountNumber: "123456",
-    fleetRep: { name: "Sarah Johnson", phone: "555-1234" },
-    email: "john.doe@tiresdash.com",
+    name: userData ? `${userData.firstName} ${userData.lastName}` : "User",
+    company: userData?.buisnessName || "TiresDash",
+    accountNumber: userData?.id || userData?._id || "N/A",
+    fleetRep: { name: "Sarah Johnson", phone: "555-1234" }, // This might come from a different API
+    email: userData?.email || "user@tiresdash.com",
+    title: userData?.title || "Fleet Manager",
+    phone: userData?.phone || "N/A",
+    phoneExtension: userData?.phoneExtension || "",
+    state: userData?.state || "",
+    city: userData?.city || "",
+    numberOfVehicles: userData?.numberOFvehicles || "0",
+    fleetProgram: userData?.fleetProgram || "Fleet Sales Specialist",
+    additionalServices: userData?.additionalServices || [],
+    isVerified: userData?.isVerified || false,
   };
 
   return (
@@ -48,6 +100,16 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-600">Account Number</p>
               <p className="font-semibold">{user.accountNumber}</p>
             </div>
+            {!user.isVerified && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                <p className="text-sm text-yellow-800">
+                  <strong>Account Status:</strong> Pending verification
+                </p>
+                <p className="text-xs text-yellow-600 mt-1">
+                  Your account is under review. You'll receive an email once verified.
+                </p>
+              </div>
+            )}
             <div className="pt-2">
               <Button variant="outline" size="sm" className="w-full bg-transparent">
                 <Download className="mr-2 h-4 w-4" />
@@ -83,20 +145,30 @@ export default function DashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Percent className="mr-2 h-5 w-5" />
-              Product Preferences
+              Services & Preferences
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <Badge variant="secondary" className="w-full justify-start">
-                5% off better and best tires
-              </Badge>
-              <Badge variant="secondary" className="w-full justify-start">
-                Retail price on labor
-              </Badge>
-              <Badge variant="secondary" className="w-full justify-start">
-                Uses Cash or Credit Card
-              </Badge>
+              {user.additionalServices.length > 0 ? (
+                user.additionalServices.map((service: string, index: number) => (
+                  <Badge key={index} variant="secondary" className="w-full justify-start">
+                    {service}
+                  </Badge>
+                ))
+              ) : (
+                <>
+                  <Badge variant="secondary" className="w-full justify-start">
+                    5% off better and best tires
+                  </Badge>
+                  <Badge variant="secondary" className="w-full justify-start">
+                    Retail price on labor
+                  </Badge>
+                  <Badge variant="secondary" className="w-full justify-start">
+                    Uses Cash or Credit Card
+                  </Badge>
+                </>
+              )}
             </div>
             <Button variant="outline" size="sm" className="w-full bg-transparent">
               <Settings className="mr-2 h-4 w-4" />
@@ -116,6 +188,7 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm text-gray-600">Primary Contact</p>
               <p className="font-semibold">{user.name}</p>
+              {user.title && <p className="text-sm text-gray-500">{user.title}</p>}
             </div>
             <div>
               <p className="text-sm text-gray-600">Email</p>
@@ -123,13 +196,40 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-sm text-gray-600">Phone</p>
-              <p className="font-semibold">(555) 987-6543</p>
+              <p className="font-semibold">
+                {user.phone}
+                {user.phoneExtension && ` ext. ${user.phoneExtension}`}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Company</p>
               <p className="font-semibold">{user.company}</p>
+              {user.city && user.state && (
+                <p className="text-sm text-gray-500">
+                  {user.city}, {user.state}
+                </p>
+              )}
             </div>
           </div>
+          {user.numberOfVehicles && (
+            <div className="mt-4 pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Fleet Size</p>
+                  <p className="font-semibold">{user.numberOfVehicles} vehicles</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Fleet Program</p>
+                  <p className="font-semibold">{user.fleetProgram}</p>
+                </div>
+                {!user.isVerified && (
+                  <Badge variant="destructive" className="ml-auto">
+                    Pending Verification
+                  </Badge>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
