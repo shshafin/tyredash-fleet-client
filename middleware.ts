@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
-const AuthRoutes = ["/login", "/register"];
+const AuthRoutes = ["/login", "/register", "/change-password", "/forgot-password", "/reset-password"];
 
 export function middleware(request: NextRequest) {
   const accessToken = request.cookies.get("accessToken"); // Fixed variable name
