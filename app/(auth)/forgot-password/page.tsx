@@ -9,14 +9,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Truck } from "lucide-react";
 import Link from "next/link";
+import { useForgotPasswordMutation } from "@/redux/features/auth/auth.api";
+import { toast } from "sonner";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [forgotPasswordFn] = useForgotPasswordMutation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
+    try {
+      const res = await forgotPasswordFn(email).unwrap();
+      if (res.success) {
+        toast.success("Please check your email for reset instructions");
+      }
+    } catch (error) {
+      toast.error("Failed to send reset instructions");
+    }
   };
 
   return (

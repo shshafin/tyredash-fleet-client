@@ -23,7 +23,14 @@ const authApi = baseApi.injectEndpoints({
         method: "POST",
       }),
     }),
+    forgotPassword: builder.mutation({
+      query: (email: string) => ({
+        url: "/fleet-auth/forgot-password",
+        method: "POST",
+        body: { email },
+      }),
+    }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogoutMutation } = authApi;
+export const { useRegisterMutation, useLoginMutation, useLogoutMutation, useForgotPasswordMutation } = authApi;
