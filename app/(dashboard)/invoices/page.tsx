@@ -1,50 +1,50 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Download, CreditCard, Calendar, DollarSign, FileText } from "lucide-react"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Download, CreditCard, Calendar, DollarSign, FileText } from "lucide-react";
 
 interface Invoice {
-  id: string
-  date: string
-  amount: number
-  status: "Paid" | "Unpaid"
-  description: string
+  id: string;
+  date: string;
+  amount: number;
+  status: "Paid" | "Unpaid";
+  description: string;
 }
 
 export default function InvoicesPage() {
-  const [invoices, setInvoices] = useState<Invoice[]>([])
-  const [billingTerms, setBillingTerms] = useState<"Net15" | "Net30">("Net30")
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [billingTerms, setBillingTerms] = useState<"Net15" | "Net30">("Net30");
 
   useEffect(() => {
-    const savedInvoices = localStorage.getItem("tiresdash_invoices")
+    const savedInvoices = localStorage.getItem("tiresdash_invoices");
     if (savedInvoices) {
-      setInvoices(JSON.parse(savedInvoices))
+      setInvoices(JSON.parse(savedInvoices));
     }
 
-    const savedBillingTerms = localStorage.getItem("tiresdash_billing_terms")
+    const savedBillingTerms = localStorage.getItem("tiresdash_billing_terms");
     if (savedBillingTerms) {
-      setBillingTerms(savedBillingTerms as "Net15" | "Net30")
+      setBillingTerms(savedBillingTerms as "Net15" | "Net30");
     }
-  }, [])
+  }, []);
 
   const handleBillingTermsChange = (isNet30: boolean) => {
-    const newTerms = isNet30 ? "Net30" : "Net15"
-    setBillingTerms(newTerms)
-    localStorage.setItem("tiresdash_billing_terms", newTerms)
-  }
+    const newTerms = isNet30 ? "Net30" : "Net15";
+    setBillingTerms(newTerms);
+    localStorage.setItem("tiresdash_billing_terms", newTerms);
+  };
 
   const totalUnpaid = invoices
     .filter((invoice) => invoice.status === "Unpaid")
-    .reduce((sum, invoice) => sum + invoice.amount, 0)
+    .reduce((sum, invoice) => sum + invoice.amount, 0);
 
   const totalPaid = invoices
     .filter((invoice) => invoice.status === "Paid")
-    .reduce((sum, invoice) => sum + invoice.amount, 0)
+    .reduce((sum, invoice) => sum + invoice.amount, 0);
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
@@ -55,7 +55,7 @@ export default function InvoicesPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        {/* <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -67,7 +67,7 @@ export default function InvoicesPage() {
               <DollarSign className="h-8 w-8 text-red-600" />
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         <Card>
           <CardContent className="p-6">
@@ -194,5 +194,5 @@ export default function InvoicesPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

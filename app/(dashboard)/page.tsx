@@ -5,12 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, HeadphonesIcon } from "lucide-react";
 import { Calendar } from "lucide-react";
 import { useMyProfileQuery } from "@/redux/features/user/usersApi";
+import { FleetCardPDF } from "@/components/FleetCardPDF";
 
 export default function DashboardPage() {
   const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery({});
+  const [isFleetCardModalOpen, setIsFleetCardModalOpen] = useState(false);
 
   console.log("profileData:", userProfile?.data);
 
@@ -111,10 +114,20 @@ export default function DashboardPage() {
               </div>
             )}
             <div className="pt-2">
-              <Button variant="outline" size="sm" className="w-full bg-transparent">
-                <Download className="mr-2 h-4 w-4" />
-                Generate Fleet Card PDF
-              </Button>
+              <Dialog open={isFleetCardModalOpen} onOpenChange={setIsFleetCardModalOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full bg-transparent">
+                    <Download className="mr-2 h-4 w-4" />
+                    Generate Fleet Card PDF
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto w-[95vw] sm:w-full">
+                  <DialogHeader>
+                    <DialogTitle className="text-center text-xl font-bold">Fleet Service Card</DialogTitle>
+                  </DialogHeader>
+                  <FleetCardPDF user={user} />
+                </DialogContent>
+              </Dialog>
             </div>
           </CardContent>
         </Card>

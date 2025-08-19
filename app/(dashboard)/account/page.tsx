@@ -1,29 +1,29 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Building, UserIcon, Plus, Edit, Trash2, Save } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Building, UserIcon, Plus, Edit, Trash2, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface CompanyInfo {
-  businessName: string
-  fleetContact: string
-  phone: string
-  email: string
-  billingAddress: string
-  servicePreferences: string
+  businessName: string;
+  fleetContact: string;
+  phone: string;
+  email: string;
+  billingAddress: string;
+  servicePreferences: string;
 }
 
 interface UserInfo {
-  id: string
-  name: string
-  email: string
-  role: string
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
 export default function AccountPage() {
@@ -34,22 +34,22 @@ export default function AccountPage() {
     email: "",
     billingAddress: "",
     servicePreferences: "",
-  })
-  const [users, setUsers] = useState<UserInfo[]>([])
-  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false)
-  const [newUser, setNewUser] = useState({ name: "", email: "", role: "User" })
-  const { toast } = useToast()
+  });
+  const [users, setUsers] = useState<UserInfo[]>([]);
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [newUser, setNewUser] = useState({ name: "", email: "", role: "User" });
+  const { toast } = useToast();
 
   useEffect(() => {
     // Load company info
-    const savedCompanyInfo = localStorage.getItem("tiresdash_company_info")
+    const savedCompanyInfo = localStorage.getItem("tiresdash_company_info");
     if (savedCompanyInfo) {
-      setCompanyInfo(JSON.parse(savedCompanyInfo))
+      setCompanyInfo(JSON.parse(savedCompanyInfo));
     } else {
       // Set default values
-      const userData = localStorage.getItem("tiresdash_user")
+      const userData = localStorage.getItem("tiresdash_user");
       if (userData) {
-        const user = JSON.parse(userData)
+        const user = JSON.parse(userData);
         setCompanyInfo({
           businessName: user.company || "",
           fleetContact: user.name || "",
@@ -57,34 +57,34 @@ export default function AccountPage() {
           email: user.email || "",
           billingAddress: "123 Business Ave\nSuite 100\nCity, ST 12345",
           servicePreferences: "Standard tire services with 5% fleet discount",
-        })
+        });
       }
     }
 
     // Load users
-    const savedUsers = localStorage.getItem("tiresdash_company_users")
+    const savedUsers = localStorage.getItem("tiresdash_company_users");
     if (savedUsers) {
-      setUsers(JSON.parse(savedUsers))
+      setUsers(JSON.parse(savedUsers));
     } else {
       // Set default users
-      const userData = localStorage.getItem("tiresdash_user")
+      const userData = localStorage.getItem("tiresdash_user");
       if (userData) {
-        const user = JSON.parse(userData)
+        const user = JSON.parse(userData);
         setUsers([
           { id: "1", name: user.name, email: user.email, role: "Admin" },
           { id: "2", name: "Jane Doe", email: "jane.doe@company.com", role: "User" },
-        ])
+        ]);
       }
     }
-  }, [])
+  }, []);
 
   const handleSaveCompanyInfo = () => {
-    localStorage.setItem("tiresdash_company_info", JSON.stringify(companyInfo))
+    localStorage.setItem("tiresdash_company_info", JSON.stringify(companyInfo));
     toast({
       title: "Success",
       description: "Company information updated successfully",
-    })
-  }
+    });
+  };
 
   const handleAddUser = () => {
     if (!newUser.name || !newUser.email) {
@@ -92,38 +92,38 @@ export default function AccountPage() {
         title: "Error",
         description: "Please fill in all required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     const user: UserInfo = {
       id: Date.now().toString(),
       ...newUser,
-    }
+    };
 
-    const updatedUsers = [...users, user]
-    setUsers(updatedUsers)
-    localStorage.setItem("tiresdash_company_users", JSON.stringify(updatedUsers))
+    const updatedUsers = [...users, user];
+    setUsers(updatedUsers);
+    localStorage.setItem("tiresdash_company_users", JSON.stringify(updatedUsers));
 
-    setNewUser({ name: "", email: "", role: "User" })
-    setIsAddUserDialogOpen(false)
+    setNewUser({ name: "", email: "", role: "User" });
+    setIsAddUserDialogOpen(false);
 
     toast({
       title: "Success",
       description: "User added successfully",
-    })
-  }
+    });
+  };
 
   const handleDeleteUser = (userId: string) => {
-    const updatedUsers = users.filter((user) => user.id !== userId)
-    setUsers(updatedUsers)
-    localStorage.setItem("tiresdash_company_users", JSON.stringify(updatedUsers))
+    const updatedUsers = users.filter((user) => user.id !== userId);
+    setUsers(updatedUsers);
+    localStorage.setItem("tiresdash_company_users", JSON.stringify(updatedUsers));
 
     toast({
       title: "Success",
       description: "User removed successfully",
-    })
-  }
+    });
+  };
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
@@ -216,7 +216,7 @@ export default function AccountPage() {
       </Card>
 
       {/* User Management */}
-      <Card>
+      {/* <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center">
@@ -308,7 +308,7 @@ export default function AccountPage() {
             ))}
           </div>
         </CardContent>
-      </Card>
+      </Card> */}
     </div>
-  )
+  );
 }
