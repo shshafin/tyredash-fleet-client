@@ -4,7 +4,7 @@ const usersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     myProfile: builder.query({
       query: () => ({
-        url: "/fleet-users/profile",
+        url: `/fleet-users/profile/me`,
         method: "GET",
       }),
     }),

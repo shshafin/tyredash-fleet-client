@@ -12,7 +12,7 @@ import { useMyProfileQuery } from "@/redux/features/user/usersApi";
 import { FleetCardPDF } from "@/components/FleetCardPDF";
 
 export default function DashboardPage() {
-  const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery({});
+  const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery(undefined);
   const [isFleetCardModalOpen, setIsFleetCardModalOpen] = useState(false);
 
   console.log("profileData:", userProfile?.data);
