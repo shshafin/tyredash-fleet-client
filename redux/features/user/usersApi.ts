@@ -8,7 +8,14 @@ const usersApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
+    updateProfile: builder.mutation({
+      query: ({ data, id }: { data: any; id: string }) => ({
+        url: `/fleet-users/profile/${id}`,
+        method: "PATCH",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useMyProfileQuery } = usersApi;
+export const { useMyProfileQuery, useUpdateProfileMutation } = usersApi;

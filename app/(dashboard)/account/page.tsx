@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Building, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useMyProfileQuery } from "@/redux/features/user/usersApi";
+import { useMyProfileQuery, useUpdateProfileMutation } from "@/redux/features/user/usersApi";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { toast } from "sonner";
+import CustomLoader from "@/components/CustomLoader";
 
 // User profile interface based on the API response
 interface UserProfile {
@@ -63,7 +65,8 @@ type CompanyInfoFormData = z.infer<typeof companyInfoSchema>;
 
 export default function AccountPage() {
   const { data: userProfile, isLoading, error } = useMyProfileQuery({});
-  const { toast } = useToast();
+
+  const [updateProfileFn] = useUpdateProfileMutation();
 
   const form = useForm<CompanyInfoFormData>({
     resolver: zodResolver(companyInfoSchema),
@@ -105,28 +108,23 @@ export default function AccountPage() {
     }
   }, [userProfile, form]);
 
-  const onSubmit = (data: CompanyInfoFormData) => {
+  const onSubmit = async (data: CompanyInfoFormData) => {
     // Here you would typically make an API call to update the company information
-    console.log("Submitting company info:", data);
 
-    // For now, just save to localStorage as a fallback
-    localStorage.setItem("tiresdash_company_info", JSON.stringify(data));
+    console.log(data, userProfile.data._id);
 
-    toast({
-      title: "Success",
-      description: "Company information updated successfully",
-    });
+    try {
+      const res = await updateProfileFn({ data, id: userProfile.data._id }).unwrap();
+      if (res.success) {
+        toast("Company information updated successfully");
+      }
+    } catch (error) {
+      toast("Error updating company information");
+    }
   };
 
   if (isLoading) {
-    return (
-      <div className="p-4 lg:p-8 space-y-6">
-        <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Company Account</h1>
-          <p className="text-gray-600">Loading company information...</p>
-        </div>
-      </div>
-    );
+    return <CustomLoader />;
   }
 
   if (error) {

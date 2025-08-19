@@ -29,7 +29,7 @@ html {
       <body>
         <ReduxWrapper>
           {children}
-          <Toaster richColors duration={3000} />
+          <Toaster richColors={true} duration={3000} />
         </ReduxWrapper>
       </body>
     </html>
