@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery(undefined);
   const [isFleetCardModalOpen, setIsFleetCardModalOpen] = useState(false);
 
-  console.log("profileData:", userProfile?.data);
+  // console.log("profileData:", userProfile?.data);
 
   // If loading, show loading state
   if (profileDataLoading) {
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Percent className="mr-2 h-5 w-5" />
+              {/* <Percent className="mr-2 h-5 w-5" /> */}
               Services & Preferences
             </CardTitle>
           </CardHeader>
@@ -183,10 +183,10 @@ export default function DashboardPage() {
                 </>
               )}
             </div>
-            <Button variant="outline" size="sm" className="w-full bg-transparent">
+            {/* <Button variant="outline" size="sm" className="w-full bg-transparent">
               <Settings className="mr-2 h-4 w-4" />
               Request a Change
-            </Button>
+            </Button> */}
           </CardContent>
         </Card>
       </div>

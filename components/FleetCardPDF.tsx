@@ -47,127 +47,160 @@ export const FleetCardPDF: React.FC<FleetCardPDFProps> = ({ user }) => {
                   size: A4;
                 }
                 body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                   margin: 0;
                   padding: 0;
-                  color: #374151;
+                  color: hsl(222.2 84% 4.9%);
                   background: white;
                   line-height: 1.5;
+                  font-size: 14px;
                 }
                 * {
                   box-sizing: border-box;
                 }
-                .card {
-                  border: 2px solid #e5e7eb;
-                  border-radius: 8px;
-                  background: white;
-                  margin-bottom: 20px;
-                  page-break-inside: avoid;
-                  overflow: hidden;
+                
+                /* Card component styles matching shadcn/ui */
+                .rounded-lg {
+                  border-radius: calc(0.5rem - 2px);
                 }
-                .card-header {
-                  padding: 20px;
-                  background: #f9fafb;
-                  border-bottom: 1px solid #e5e7eb;
+                .border {
+                  border: 1px solid hsl(214.3 31.8% 91.4%);
                 }
-                .card-title {
-                  font-size: 18px;
-                  font-weight: 600;
-                  margin: 0;
+                .bg-card {
+                  background-color: hsl(0 0% 100%);
+                }
+                .text-card-foreground {
+                  color: hsl(222.2 84% 4.9%);
+                }
+                .shadow-sm {
+                  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+                }
+                
+                /* Card header */
+                .flex {
                   display: flex;
-                  align-items: center;
-                  color: #1f2937;
                 }
-                .card-content {
-                  padding: 20px;
+                .flex-col {
+                  flex-direction: column;
                 }
-                .space-y-3 > * + * {
-                  margin-top: 12px;
+                .space-y-1\.5 > * + * {
+                  margin-top: 0.375rem;
                 }
-                .space-y-2 > * + * {
-                  margin-top: 8px;
+                .p-6 {
+                  padding: 1.5rem;
                 }
-                .text-sm {
-                  font-size: 14px;
+                .pb-2 {
+                  padding-bottom: 0.5rem;
                 }
-                .text-gray-600 {
-                  color: #6b7280;
+                
+                /* Card title */
+                .text-2xl {
+                  font-size: 1.5rem;
+                  line-height: 2rem;
                 }
                 .font-semibold {
                   font-weight: 600;
-                  color: #1f2937;
                 }
-                .badge {
-                  display: inline-block;
-                  border-radius: 4px;
-                  padding: 6px 12px;
-                  font-size: 12px;
-                  font-weight: 500;
-                  background: #f3f4f6;
-                  color: #374151;
-                  margin-bottom: 6px;
-                  margin-right: 6px;
-                  border: 1px solid #d1d5db;
+                .leading-none {
+                  line-height: 1;
                 }
-                .verification-warning {
-                  background: #fef3c7;
-                  border: 2px solid #f59e0b;
-                  border-radius: 6px;
-                  padding: 12px;
-                  margin: 12px 0;
+                .tracking-tight {
+                  letter-spacing: -0.025em;
                 }
-                .verification-warning p {
-                  margin: 0;
-                  color: #92400e;
-                  font-size: 14px;
+                .flex.items-center {
+                  align-items: center;
                 }
-                .verification-warning strong {
+                
+                /* Card content */
+                .pt-0 {
+                  padding-top: 0;
+                }
+                .space-y-3 > * + * {
+                  margin-top: 0.75rem;
+                }
+                
+                /* Text styles */
+                .text-sm {
+                  font-size: 0.875rem;
+                  line-height: 1.25rem;
+                }
+                .text-muted-foreground {
+                  color: hsl(215.4 16.3% 46.9%);
+                }
+                .font-semibold {
                   font-weight: 600;
                 }
-                .grid {
-                  display: grid;
-                  gap: 16px;
+                
+                /* Icon styles */
+                .mr-2 {
+                  margin-right: 0.5rem;
                 }
-                .grid-cols-2 {
-                  grid-template-columns: repeat(2, 1fr);
+                .h-5 {
+                  height: 1.25rem;
                 }
-                .contact-grid {
-                  display: grid;
-                  grid-template-columns: repeat(2, 1fr);
-                  gap: 16px;
-                  margin-top: 16px;
+                .w-5 {
+                  width: 1.25rem;
                 }
-                .icon {
-                  width: 16px;
-                  height: 16px;
-                  margin-right: 8px;
-                  vertical-align: middle;
+                
+                /* Warning box styles */
+                .bg-yellow-50 {
+                  background-color: rgb(254 252 232);
                 }
+                .border-yellow-200 {
+                  border-color: rgb(254 240 138);
+                }
+                .rounded-md {
+                  border-radius: 0.375rem;
+                }
+                .p-3 {
+                  padding: 0.75rem;
+                }
+                .text-yellow-800 {
+                  color: rgb(133 77 14);
+                }
+                .text-yellow-600 {
+                  color: rgb(217 119 6);
+                }
+                .text-xs {
+                  font-size: 0.75rem;
+                  line-height: 1rem;
+                }
+                .mt-1 {
+                  margin-top: 0.25rem;
+                }
+                
+                /* Header styles */
                 .header {
                   text-align: center;
                   margin-bottom: 30px;
                   padding-bottom: 20px;
-                  border-bottom: 3px solid #1f2937;
+                  border-bottom: 3px solid hsl(222.2 84% 4.9%);
                 }
                 .company-logo {
                   font-size: 28px;
                   font-weight: bold;
-                  color: #1f2937;
+                  color: hsl(222.2 84% 4.9%);
                   margin-bottom: 8px;
                   letter-spacing: -0.5px;
                 }
                 .fleet-card-title {
                   font-size: 18px;
-                  color: #6b7280;
+                  color: hsl(215.4 16.3% 46.9%);
                   font-weight: 500;
                 }
                 .print-date {
                   text-align: right;
                   font-size: 12px;
-                  color: #9ca3af;
+                  color: hsl(215.4 16.3% 46.9%);
                   margin-top: 20px;
                   font-style: italic;
                 }
+                
+                /* Utility classes */
+                .space-y-6 > * + * {
+                  margin-top: 1.5rem;
+                }
+                
                 @media print {
                   body { 
                     margin: 0; 
@@ -177,13 +210,27 @@ export const FleetCardPDF: React.FC<FleetCardPDFProps> = ({ user }) => {
                   .no-print { 
                     display: none !important; 
                   }
-                  .card {
-                    box-shadow: none;
-                    border: 2px solid #000;
+                  .rounded-lg {
+                    border-radius: calc(0.5rem - 2px);
                   }
-                  .card-header {
-                    background: #f8f9fa !important;
+                  .border {
+                    border: 1px solid hsl(214.3 31.8% 91.4%);
+                  }
+                  .shadow-sm {
+                    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+                  }
+                  .bg-yellow-50 {
+                    background-color: rgb(254 252 232) !important;
                     -webkit-print-color-adjust: exact;
+                  }
+                  .border-yellow-200 {
+                    border-color: rgb(254 240 138) !important;
+                  }
+                  .text-yellow-800 {
+                    color: rgb(133 77 14) !important;
+                  }
+                  .text-yellow-600 {
+                    color: rgb(217 119 6) !important;
                   }
                 }
               </style>
@@ -193,7 +240,9 @@ export const FleetCardPDF: React.FC<FleetCardPDFProps> = ({ user }) => {
                 <div class="company-logo">TiresDash</div>
                 <div class="fleet-card-title">Fleet Service Card</div>
               </div>
-              ${printContents}
+              <div class="space-y-6">
+                ${printContents}
+              </div>
               <div class="print-date">
                 Generated on ${new Date().toLocaleDateString("en-US", {
                   year: "numeric",
@@ -253,76 +302,6 @@ export const FleetCardPDF: React.FC<FleetCardPDFProps> = ({ user }) => {
                 </p>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Contact Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Contact Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Email</p>
-                <p className="font-semibold">{user.email}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Phone</p>
-                <p className="font-semibold">
-                  {user.phone}
-                  {user.phoneExtension && ` ext. ${user.phoneExtension}`}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Location</p>
-                <p className="font-semibold">{user.city && user.state ? `${user.city}, ${user.state}` : "N/A"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Fleet Size</p>
-                <p className="font-semibold">{user.numberOfVehicles} vehicles</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Services & Preferences */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Percent className="mr-2 h-5 w-5" />
-              Services & Preferences
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-600 mb-2">Fleet Program</p>
-              <p className="font-semibold">{user.fleetProgram}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 mb-2">Additional Services</p>
-              <div className="space-y-2">
-                {user.additionalServices.length > 0 ? (
-                  user.additionalServices.map((service: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="w-full justify-start">
-                      {service}
-                    </Badge>
-                  ))
-                ) : (
-                  <>
-                    <Badge variant="secondary" className="w-full justify-start">
-                      5% off better and best tires
-                    </Badge>
-                    <Badge variant="secondary" className="w-full justify-start">
-                      Retail price on labor
-                    </Badge>
-                    <Badge variant="secondary" className="w-full justify-start">
-                      Uses Cash or Credit Card
-                    </Badge>
-                  </>
-                )}
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
