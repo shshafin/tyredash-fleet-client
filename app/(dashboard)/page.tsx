@@ -10,15 +10,20 @@ import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, 
 import { Calendar } from "lucide-react";
 import { useMyProfileQuery } from "@/redux/features/user/usersApi";
 import { FleetCardPDF } from "@/components/FleetCardPDF";
+import { useMyAppointmentsQuery } from "@/redux/features/appointment/fleetAppointmentsApi";
 
 export default function DashboardPage() {
   const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery(undefined);
   const [isFleetCardModalOpen, setIsFleetCardModalOpen] = useState(false);
+  const { data: myAppointments, isLoading: myAppointmentsLoading } = useMyAppointmentsQuery(null);
+
+  // Find the latest appointment with a fleetRef
+  const fleetRef = myAppointments?.data?.find((appointment: any) => appointment.fleetRef)?.fleetRef;
 
   // console.log("profileData:", userProfile?.data);
 
   // If loading, show loading state
-  if (profileDataLoading) {
+  if (profileDataLoading || myAppointmentsLoading) {
     return (
       <div className="p-4 lg:p-8 space-y-6">
         <div className="bg-white rounded-lg border p-6">
@@ -63,7 +68,7 @@ export default function DashboardPage() {
     name: userData ? `${userData.firstName} ${userData.lastName}` : "User",
     company: userData?.buisnessName || "TiresDash",
     accountNumber: userData?.id || userData?._id || "N/A",
-    fleetRep: { name: "Sarah Johnson", phone: "555-1234" }, // This might come from a different API
+    // fleetRep: { name: "Sarah Johnson", phone: "555-1234" }, // This might come from a different API
     email: userData?.email || "user@tiresdash.com",
     title: userData?.title || "Fleet Manager",
     phone: userData?.phone || "N/A",
@@ -138,18 +143,46 @@ export default function DashboardPage() {
             <CardTitle>Assigned Fleet Rep</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div>
-              <p className="font-semibold">{user.fleetRep.name}</p>
-              <p className="text-sm text-gray-600">Fleet Service Representative</p>
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Phone className="mr-2 h-4 w-4" />
-              {user.fleetRep.phone}
-            </div>
-            <div className="flex items-center text-sm text-gray-600">
-              <Mail className="mr-2 h-4 w-4" />
-              sarah.johnson@tiresdash.com
-            </div>
+            {myAppointmentsLoading ? (
+              <>
+                <Skeleton className="h-4 w-40" />
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="h-4 w-4" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </>
+            ) : fleetRef ? (
+              <>
+                <div>
+                  <p className="text-sm text-gray-600">Fleet Service Representative</p>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Phone className="mr-2 h-4 w-4" />
+                  {fleetRef.phone}
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Mail className="mr-2 h-4 w-4" />
+                  {fleetRef.email}
+                </div>
+                {fleetRef.note && (
+                  <div className="pt-2">
+                    <p className="text-sm text-gray-600">Note</p>
+                    <p className="text-sm text-gray-800">{fleetRef.note}</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500">No fleet representative assigned yet</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  A representative will be assigned when you schedule your first service
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
