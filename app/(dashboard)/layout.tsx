@@ -26,6 +26,11 @@ const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Schedule Appointment", href: "/schedule", icon: Calendar },
   { name: "Request Support", href: "/support", icon: HeadphonesIcon },
+  {
+    name: "My Appointments",
+    href: "/may-appointments",
+    icon: Calendar,
+  },
   { name: "Invoices / Payments", href: "/invoices", icon: FileText },
   { name: "My Fleet", href: "/fleet", icon: Truck },
   { name: "Company Account", href: "/account", icon: Building },
