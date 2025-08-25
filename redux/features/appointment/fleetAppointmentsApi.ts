@@ -50,6 +50,16 @@ const fleetAppointmentsApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["FleetAppointments"],
     }),
+
+
+    myAppointments: builder.query({
+      query: () => ({
+        url: "/fleet-appointments/my-appointments",
+        method: "GET",
+      }),
+      providesTags: ["FleetAppointments"],
+    }),
+
   }),
 });
 
@@ -59,4 +69,5 @@ export const {
   useGetFleetAppointmentByIdQuery,
   useUpdateFleetAppointmentMutation,
   useDeleteFleetAppointmentMutation,
+  useMyAppointmentsQuery,
 } = fleetAppointmentsApi;
