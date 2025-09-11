@@ -1,10 +1,10 @@
 "use client";
 
-import type React from "react";
-import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import type React from "react";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import * as z from "zod";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,10 +14,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { IVehicle, ServiceType } from "@/constants/fleet.types";
 
-import { useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
-import { Calendar, CheckCircle, Clock, MapPin, Upload, X } from "lucide-react";
-import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
 import { useCreateFleetAppointmentMutation } from "@/redux/features/appointment/fleetAppointmentsApi";
+import { useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
+import { SelectGroup, SelectLabel } from "@radix-ui/react-select";
+import { Calendar, Clock, MapPin, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 // Validation schema
