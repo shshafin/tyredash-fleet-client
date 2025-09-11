@@ -25,12 +25,30 @@ const authApi = baseApi.injectEndpoints({
     }),
     forgotPassword: builder.mutation({
       query: (email: string) => ({
-        url: "/fleet-auth/forgot-password",
+        url: "/auth/forgot-password",
         method: "POST",
         body: { email },
+      }),
+    }),
+
+    // reset-password
+    resetPassword: builder.mutation({
+      query: ({ data, token }: { data: { newPassword: string }; token: string }) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        body: data,
+        headers: {
+          Authorization: token,
+        },
       }),
     }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation, useLogoutMutation, useForgotPasswordMutation } = authApi;
+export const {
+  useRegisterMutation,
+  useLoginMutation,
+  useLogoutMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
+} = authApi;

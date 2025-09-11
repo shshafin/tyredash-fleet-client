@@ -4,7 +4,7 @@ import { deleteCookies } from "./DeleteCookies";
 export const logoutUser = (router: AppRouterInstance) => {
   localStorage.removeItem("accessToken");
   deleteCookies(["accessToken", "refreshToken"]);
-  router.push("/auth/signin");
+  router.push("/login");
   router.refresh();
   // hello
 };

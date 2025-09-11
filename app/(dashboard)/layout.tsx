@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import { logoutUser } from "@/service/logoutUser";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: Home },
@@ -46,6 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const handleLogout = async () => {
     await logoutFn({}).unwrap();
+    await logoutUser(router);
     router.push("/login");
   };
 
