@@ -14,6 +14,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
 import CustomLoader from "@/components/CustomLoader";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // User profile interface based on the API response
 interface UserProfile {
@@ -44,6 +45,15 @@ interface UserProfile {
   id: string;
 }
 
+// Additional services options from backend enum
+const additionalServicesOptions = [
+  "Coast Fuel Savings",
+  "Discount Tire Telematics by Motorq",
+  "Revvo Smart Tire",
+  "Roadside Assistance by NSD",
+  "Spiffy Mobile Oil Change Service",
+];
+
 // Company information form schema
 const companyInfoSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
@@ -51,7 +61,7 @@ const companyInfoSchema = z.object({
   phone: z.string().min(1, "Phone number is required"),
   email: z.string().email("Please enter a valid email address"),
   billingAddress: z.string().min(1, "Billing address is required"),
-  servicePreferences: z.string().optional(),
+  servicePreferences: z.array(z.string()).optional(),
   // Additional fields from API
   state: z.string().optional(),
   city: z.string().optional(),
@@ -76,7 +86,7 @@ export default function AccountPage() {
       phone: "",
       email: "",
       billingAddress: "",
-      servicePreferences: "",
+      servicePreferences: [],
       state: "",
       city: "",
       numberOfBusinessYear: "",
@@ -97,7 +107,7 @@ export default function AccountPage() {
         phone: userData.phone || "",
         email: userData.email || "",
         billingAddress: userData.city && userData.state ? `${userData.city}, ${userData.state}` : "",
-        servicePreferences: userData.additionalServices?.join(", ") || "",
+        servicePreferences: userData.additionalServices || [],
         state: userData.state || "",
         city: userData.city || "",
         numberOfBusinessYear: userData.numberOfbuisnessYear || "",
@@ -118,7 +128,7 @@ export default function AccountPage() {
       email: data.email,
       city: data.city,
       state: data.state,
-      additionalServices: data.servicePreferences ? data.servicePreferences.split(", ").filter((s) => s.trim()) : [],
+      additionalServices: data.servicePreferences || [],
       numberOfbuisnessYear: data.numberOfBusinessYear,
       numberOFvehicles: data.numberOfVehicles,
       title: data.title,
@@ -336,11 +346,26 @@ export default function AccountPage() {
                   <FormItem>
                     <FormLabel>Service Preferences</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="Describe your preferred service options and requirements"
-                        rows={3}
-                        {...field}
-                      />
+                      <div className="space-y-2">
+                        {additionalServicesOptions.map((option) => (
+                          <div key={option} className="flex items-center space-x-2">
+                            <Checkbox
+                              checked={field.value?.includes(option)}
+                              onCheckedChange={(checked) => {
+                                const current = field.value || [];
+                                if (checked) {
+                                  field.onChange([...current, option]);
+                                } else {
+                                  field.onChange(current.filter((item) => item !== option));
+                                }
+                              }}
+                            />
+                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                              {option}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
