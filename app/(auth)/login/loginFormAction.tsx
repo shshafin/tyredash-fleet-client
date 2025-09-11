@@ -1,7 +1,7 @@
 "use server";
 
+import setAccessToken from "@/service/SetAccessToken";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -30,7 +30,9 @@ export const login = async (prevState: any, data: FormData) => {
   const user = await response.json();
   console.log(user);
 
-  (await cookies()).set("accessToken", user.data.accessToken);
+  // (await cookies()).set("accessToken", user.data.accessToken);
 
-  redirect("/"); // Redirect after successful login
+  // redirect("/"); // Redirect after successful login
+  setAccessToken(user.data.accessToken, "accessToken");
+  redirect("/");
 };
