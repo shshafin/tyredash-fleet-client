@@ -8,5 +8,5 @@ export const baseApi = createApi({
     credentials: "include",
   }),
   endpoints: () => ({}),
-  tagTypes: ["FleetVehicles", "FleetAppointments", "FleetSupport"],
+  tagTypes: ["FleetVehicles", "FleetAppointments", "FleetSupport", "FleetUser"],
 });

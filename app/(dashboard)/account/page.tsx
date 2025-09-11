@@ -109,12 +109,26 @@ export default function AccountPage() {
   }, [userProfile, form]);
 
   const onSubmit = async (data: CompanyInfoFormData) => {
-    // Here you would typically make an API call to update the company information
+    // Transform the form data to match the backend schema
+    const transformedData = {
+      buisnessName: data.businessName,
+      firstName: data.fleetContact.split(" ")[0] || "",
+      lastName: data.fleetContact.split(" ").slice(1).join(" ") || "",
+      phone: data.phone,
+      email: data.email,
+      city: data.city,
+      state: data.state,
+      additionalServices: data.servicePreferences ? data.servicePreferences.split(", ").filter((s) => s.trim()) : [],
+      numberOfbuisnessYear: data.numberOfBusinessYear,
+      numberOFvehicles: data.numberOfVehicles,
+      title: data.title,
+      phoneExtension: data.phoneExtension,
+    };
 
-    console.log(data, userProfile.data._id);
+    console.log(transformedData, userProfile.data._id);
 
     try {
-      const res = await updateProfileFn({ data, id: userProfile.data._id }).unwrap();
+      const res = await updateProfileFn({ data: transformedData, id: userProfile.data._id }).unwrap();
       if (res.success) {
         toast("Company information updated successfully");
       }

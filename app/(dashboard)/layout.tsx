@@ -48,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const handleLogout = async () => {
     await logoutFn({}).unwrap();
     await logoutUser(router);
-    router.push("/login");
+    // router.push("/login");
   };
 
   const Sidebar = ({ mobile = false }) => (

@@ -7,6 +7,7 @@ const usersApi = baseApi.injectEndpoints({
         url: `/fleet-users/profile/me`,
         method: "GET",
       }),
+      providesTags: ["FleetUser"],
     }),
     updateProfile: builder.mutation({
       query: ({ data, id }: { data: any; id: string }) => ({
@@ -14,6 +15,7 @@ const usersApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: data,
       }),
+      invalidatesTags: ["FleetUser"],
     }),
   }),
 });
