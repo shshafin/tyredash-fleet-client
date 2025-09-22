@@ -8,9 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Truck, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useActionState, useState } from "react";
-import { login } from "./loginFormAction";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useLoginMutation } from "@/redux/features/auth/auth.api";
 import { useRouter } from "next/navigation";
@@ -24,8 +30,8 @@ const formSchema = z.object({
 
 export default function FleetLoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loginFn, { isLoading, error }] = useLoginMutation();
-  // const [state, fromAction] = useActionState(login, { success: false, error: "" });
+  const [loginFn, { isLoading }] = useLoginMutation();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -37,16 +43,24 @@ export default function FleetLoginPage() {
   });
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+    setErrorMessage(null);
     try {
       const res = await loginFn(data).unwrap();
-      if (res.success) {
-        router.push("/");
+      // backend e success response mane login successful & isAdminApproved true
+      router.push("/");
+    } catch (err: any) {
+      // backend error check
+      if (err?.data?.message === "Your account is not approved by admin") {
+        setErrorMessage("Waiting for admin approval. Please try later.");
+      } else if (err?.data?.message === "password mismatch") {
+        setErrorMessage("Invalid email or password");
+      } else if (err?.data?.message === "Fleet user does not exist") {
+        setErrorMessage("User not found");
+      } else {
+        setErrorMessage("Something went wrong. Try again.");
       }
-    } catch (error) {}
+    }
   };
-
-  // console.log(error);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -57,12 +71,16 @@ export default function FleetLoginPage() {
               <Truck className="h-8 w-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">TiresDash</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gray-900">
+            TiresDash
+          </CardTitle>
           <p className="text-gray-600">Fleet Portal Login</p>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <form
+              onSubmit={form.handleSubmit(handleSubmit)}
+              className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -70,7 +88,11 @@ export default function FleetLoginPage() {
                   <FormItem>
                     <FormLabel>Email Address</FormLabel>
                     <FormControl>
-                      <Input type="email" placeholder="Enter your email" {...field} />
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -84,15 +106,22 @@ export default function FleetLoginPage() {
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Input type={showPassword ? "text" : "password"} placeholder="Enter your password" {...field} />
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          {...field}
+                        />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
                           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          onClick={() => setShowPassword(!showPassword)}>
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </FormControl>
@@ -100,22 +129,21 @@ export default function FleetLoginPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="w-full">
-                Sign In
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}>
+                {isLoading ? "Logging in..." : "Sign In"}
               </Button>
             </form>
           </Form>
 
-          {error && (
-            <Alert variant="destructive" className="mt-4">
+          {errorMessage && (
+            <Alert
+              variant="destructive"
+              className="mt-4">
               <AlertTitle>Error</AlertTitle>
-              <AlertDescription>
-                {"data" in error && error.data && typeof error.data === "object" && "message" in error.data
-                  ? (error.data as { message?: string }).message === "password mismatch"
-                    ? "Invalid email or password"
-                    : "Something Went Wrong"
-                  : "Something Went Wrong"}
-              </AlertDescription>
+              <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
 
@@ -124,14 +152,18 @@ export default function FleetLoginPage() {
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline">
+              <Link
+                href="/register"
+                className="text-blue-600 hover:underline">
                 Register
               </Link>
             </p>
           </div>
 
           <div className="text-center">
-            <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:underline">
               Forgot your password?
             </Link>
           </div>
