@@ -5,20 +5,43 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Download, FileText, Phone, Mail, CreditCard, Percent, Settings, Truck, HeadphonesIcon } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Download,
+  FileText,
+  Phone,
+  Mail,
+  CreditCard,
+  Percent,
+  Settings,
+  Truck,
+  HeadphonesIcon,
+} from "lucide-react";
 import { Calendar } from "lucide-react";
 import { useMyProfileQuery } from "@/redux/features/user/usersApi";
 import { FleetCardPDF } from "@/components/FleetCardPDF";
 import { useMyAppointmentsQuery } from "@/redux/features/appointment/fleetAppointmentsApi";
 
 export default function DashboardPage() {
-  const { data: userProfile, isLoading: profileDataLoading, error } = useMyProfileQuery(undefined);
+  const {
+    data: userProfile,
+    isLoading: profileDataLoading,
+    error,
+  } = useMyProfileQuery(undefined);
   const [isFleetCardModalOpen, setIsFleetCardModalOpen] = useState(false);
-  const { data: myAppointments, isLoading: myAppointmentsLoading } = useMyAppointmentsQuery(null);
+  const { data: myAppointments, isLoading: myAppointmentsLoading } =
+    useMyAppointmentsQuery(null);
 
   // Find the latest appointment with a fleetRef
-  const fleetRef = myAppointments?.data?.find((appointment: any) => appointment.fleetRef)?.fleetRef;
+  const fleetRef = myAppointments?.data?.find(
+    (appointment: any) => appointment.fleetRef
+  )?.fleetRef;
 
   // console.log("profileData:", userProfile?.data);
 
@@ -54,7 +77,9 @@ export default function DashboardPage() {
       <div className="p-4 lg:p-8">
         <Card className="border-red-200">
           <CardContent className="p-6 text-center">
-            <p className="text-red-600">Failed to load profile data. Please refresh the page.</p>
+            <p className="text-red-600">
+              Failed to load profile data. Please refresh the page.
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -79,14 +104,19 @@ export default function DashboardPage() {
     fleetProgram: userData?.fleetProgram || "Fleet Sales Specialist",
     additionalServices: userData?.additionalServices || [],
     isVerified: userData?.isVerified || false,
+    isAdminApproved: userData?.isAdminApproved || false,
   };
 
   return (
     <div className="p-4 lg:p-8 space-y-6">
       {/* Welcome Header */}
       <div className="bg-white rounded-lg border p-6">
-        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Welcome back, {user.name}!</h1>
-        <p className="text-gray-600">Manage your fleet services and account from your dashboard.</p>
+        <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+          Welcome back, {user.name}!
+        </h1>
+        <p className="text-gray-600">
+          Manage your fleet services and account from your dashboard.
+        </p>
       </div>
 
       {/* Account Info Grid */}
@@ -108,29 +138,39 @@ export default function DashboardPage() {
               <p className="text-sm text-gray-600">Account Number</p>
               <p className="font-semibold">{user.accountNumber}</p>
             </div>
-            {!user.isVerified && (
+            {!user.isAdminApproved && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
                 <p className="text-sm text-yellow-800">
                   <strong>Account Status:</strong> Pending verification
                 </p>
                 <p className="text-xs text-yellow-600 mt-1">
-                  Your account is under review. You'll receive an email once verified.
+                  Your account is under review. You'll receive an email once
+                  verified.
                 </p>
               </div>
             )}
-            <div className="pt-2">
-              <Dialog open={isFleetCardModalOpen} onOpenChange={setIsFleetCardModalOpen}>
+            <div className="pt-2 px-2 sm:px-0">
+              <Dialog
+                open={isFleetCardModalOpen}
+                onOpenChange={setIsFleetCardModalOpen}>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="w-full bg-transparent">
-                    <Download className="mr-2 h-4 w-4" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full sm:w-auto bg-white hover:bg-gray-50 border border-gray-300 text-gray-800 flex items-center justify-center gap-2 transition-all">
+                    <Download className="h-4 w-4" />
                     Generate Fleet Card PDF
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto w-[95vw] sm:w-full">
+                <DialogContent className="max-w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl max-h-[90vh] w-[95vw] sm:w-[50vw] md:w-[70vw] lg:w-[40vw] xl:w-[50vw] overflow-y-auto rounded-lg p-4 shadow-lg">
                   <DialogHeader>
-                    <DialogTitle className="text-center text-xl font-bold">Fleet Service Card</DialogTitle>
+                    <DialogTitle className="text-center text-lg sm:text-xl font-bold text-gray-900">
+                      Fleet Service Card
+                    </DialogTitle>
                   </DialogHeader>
-                  <FleetCardPDF user={user} />
+                  <div className="mt-4">
+                    <FleetCardPDF user={user} />
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -158,7 +198,9 @@ export default function DashboardPage() {
             ) : fleetRef ? (
               <>
                 <div>
-                  <p className="text-sm text-gray-600">Fleet Service Representative</p>
+                  <p className="text-sm text-gray-600">
+                    Fleet Service Representative
+                  </p>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <Phone className="mr-2 h-4 w-4" />
@@ -177,9 +219,12 @@ export default function DashboardPage() {
               </>
             ) : (
               <div className="text-center py-4">
-                <p className="text-sm text-gray-500">No fleet representative assigned yet</p>
+                <p className="text-sm text-gray-500">
+                  No fleet representative assigned yet
+                </p>
                 <p className="text-xs text-gray-400 mt-1">
-                  A representative will be assigned when you schedule your first service
+                  A representative will be assigned when you schedule your first
+                  service
                 </p>
               </div>
             )}
@@ -197,20 +242,31 @@ export default function DashboardPage() {
           <CardContent className="space-y-3">
             <div className="space-y-2">
               {user.additionalServices.length > 0 ? (
-                user.additionalServices.map((service: string, index: number) => (
-                  <Badge key={index} variant="secondary" className="w-full justify-start">
-                    {service}
-                  </Badge>
-                ))
+                user.additionalServices.map(
+                  (service: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="w-full justify-start">
+                      {service}
+                    </Badge>
+                  )
+                )
               ) : (
                 <>
-                  <Badge variant="secondary" className="w-full justify-start">
+                  <Badge
+                    variant="secondary"
+                    className="w-full justify-start">
                     5% off better and best tires
                   </Badge>
-                  <Badge variant="secondary" className="w-full justify-start">
+                  <Badge
+                    variant="secondary"
+                    className="w-full justify-start">
                     Retail price on labor
                   </Badge>
-                  <Badge variant="secondary" className="w-full justify-start">
+                  <Badge
+                    variant="secondary"
+                    className="w-full justify-start">
                     Uses Cash or Credit Card
                   </Badge>
                 </>
@@ -234,7 +290,9 @@ export default function DashboardPage() {
             <div>
               <p className="text-sm text-gray-600">Primary Contact</p>
               <p className="font-semibold">{user.name}</p>
-              {user.title && <p className="text-sm text-gray-500">{user.title}</p>}
+              {user.title && (
+                <p className="text-sm text-gray-500">{user.title}</p>
+              )}
             </div>
             <div>
               <p className="text-sm text-gray-600">Email</p>
@@ -262,14 +320,18 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Fleet Size</p>
-                  <p className="font-semibold">{user.numberOfVehicles} vehicles</p>
+                  <p className="font-semibold">
+                    {user.numberOfVehicles} vehicles
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">Fleet Program</p>
                   <p className="font-semibold">{user.fleetProgram}</p>
                 </div>
-                {!user.isVerified && (
-                  <Badge variant="destructive" className="ml-auto">
+                {!user.isAdminApproved && (
+                  <Badge
+                    variant="destructive"
+                    className="ml-auto">
                     Pending Verification
                   </Badge>
                 )}

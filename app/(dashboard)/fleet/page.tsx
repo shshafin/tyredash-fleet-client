@@ -3,11 +3,35 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useDeleteFleetVehicleMutation, useGetAllFleetVehiclesQuery } from "@/redux/features/vehicles/fleetVehiclesApi";
-import { Edit, Plus, Search, Trash2, Upload, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  useDeleteFleetVehicleMutation,
+  useGetAllFleetVehiclesQuery,
+} from "@/redux/features/vehicles/fleetVehiclesApi";
+import {
+  Edit,
+  Plus,
+  Search,
+  Trash2,
+  Upload,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useState, useMemo } from "react";
 import AddVehicleForm from "./AddVehicleForm";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
@@ -38,8 +62,10 @@ export default function FleetPage() {
   const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   // Api calls
-  const { data: vehiclesData, isLoading: isLoadingVehicles } = useGetAllFleetVehiclesQuery(undefined);
-  const [deleteVehicle, { isLoading: isDeleting }] = useDeleteFleetVehicleMutation();
+  const { data: vehiclesData, isLoading: isLoadingVehicles } =
+    useGetAllFleetVehiclesQuery(undefined);
+  const [deleteVehicle, { isLoading: isDeleting }] =
+    useDeleteFleetVehicleMutation();
 
   const vehicles: Vehicle[] = vehiclesData?.data || [];
 
@@ -143,17 +169,23 @@ export default function FleetPage() {
     <div className="p-4 lg:p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">My Fleet</h1>
-          <p className="text-gray-600">Manage your fleet vehicles and tire preferences</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+            My Fleet
+          </h1>
+          <p className="text-gray-600">
+            Manage your fleet vehicles and tire preferences
+          </p>
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2">
-          <Button variant="outline" className="w-full sm:w-auto bg-transparent">
+          {/* <Button variant="outline" className="w-full sm:w-auto bg-transparent">
             <Upload className="mr-2 h-4 w-4" />
             Upload CSV
-          </Button>
+          </Button> */}
 
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
@@ -198,9 +230,10 @@ export default function FleetPage() {
               <span className="text-sm text-gray-500">Show:</span>
               <select
                 value={itemsPerPage}
-                onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-                className="border rounded px-2 py-1 text-sm"
-              >
+                onChange={(e) =>
+                  handleItemsPerPageChange(Number(e.target.value))
+                }
+                className="border rounded px-2 py-1 text-sm">
                 <option value={5}>5</option>
                 <option value={10}>10</option>
                 <option value={20}>20</option>
@@ -234,15 +267,23 @@ export default function FleetPage() {
                               <p className="font-semibold">
                                 {vehicle.year} {vehicle.make} {vehicle.model}
                               </p>
-                              {vehicle.note && <p className="text-sm text-gray-500">{vehicle.note}</p>}
+                              {vehicle.note && (
+                                <p className="text-sm text-gray-500">
+                                  {vehicle.note}
+                                </p>
+                              )}
                             </div>
                           </TableCell>
-                          <TableCell className="font-mono text-sm">{vehicle.vin}</TableCell>
+                          <TableCell className="font-mono text-sm">
+                            {vehicle.vin}
+                          </TableCell>
                           <TableCell>{vehicle.licensePlate}</TableCell>
                           <TableCell>
                             <div className="space-y-1">
                               {vehicle.tireSize && (
-                                <Badge variant="outline" className="text-xs">
+                                <Badge
+                                  variant="outline"
+                                  className="text-xs">
                                   Tire Size: {vehicle.tireSize}
                                 </Badge>
                               )}
@@ -250,7 +291,10 @@ export default function FleetPage() {
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
-                              <Button variant="outline" size="sm" onClick={() => handleEditClick(vehicle)}>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleEditClick(vehicle)}>
                                 <Edit className="h-4 w-4" />
                               </Button>
 
@@ -258,8 +302,7 @@ export default function FleetPage() {
                                 onClick={() => handleDeleteClick(vehicle)}
                                 variant="outline"
                                 size="sm"
-                                className="text-red-600 hover:text-red-700"
-                              >
+                                className="text-red-600 hover:text-red-700">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
@@ -274,7 +317,8 @@ export default function FleetPage() {
                 {totalPages > 1 && (
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
                     <div className="text-sm text-gray-500">
-                      Showing {startIndex + 1} to {Math.min(endIndex, filteredVehicles.length)} of{" "}
+                      Showing {startIndex + 1} to{" "}
+                      {Math.min(endIndex, filteredVehicles.length)} of{" "}
                       {filteredVehicles.length} results
                     </div>
 
@@ -283,8 +327,7 @@ export default function FleetPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
+                        disabled={currentPage === 1}>
                         <ChevronLeft className="h-4 w-4" />
                         Previous
                       </Button>
@@ -293,12 +336,15 @@ export default function FleetPage() {
                         {pageNumbers.map((page, index) => (
                           <Button
                             key={index}
-                            variant={page === currentPage ? "default" : "outline"}
+                            variant={
+                              page === currentPage ? "default" : "outline"
+                            }
                             size="sm"
-                            onClick={() => typeof page === "number" && handlePageChange(page)}
+                            onClick={() =>
+                              typeof page === "number" && handlePageChange(page)
+                            }
                             disabled={page === "..."}
-                            className={page === "..." ? "cursor-default" : ""}
-                          >
+                            className={page === "..." ? "cursor-default" : ""}>
                             {page}
                           </Button>
                         ))}
@@ -308,8 +354,7 @@ export default function FleetPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
+                        disabled={currentPage === totalPages}>
                         Next
                         <ChevronRight className="h-4 w-4" />
                       </Button>
@@ -323,10 +368,14 @@ export default function FleetPage() {
       )}
 
       {/* Edit Vehicle Dialog - Moved outside table structure */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+      <Dialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-center underline mb-5">Edit Vehicle</DialogTitle>
+            <DialogTitle className="text-center underline mb-5">
+              Edit Vehicle
+            </DialogTitle>
           </DialogHeader>
 
           {editingVehicle && (
@@ -340,22 +389,30 @@ export default function FleetPage() {
       </Dialog>
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      <Dialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Confirm Delete</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Are you sure you want to delete this vehicle? This action cannot be undone.
+              Are you sure you want to delete this vehicle? This action cannot
+              be undone.
             </p>
             {vehicleToDelete && (
               <div className="bg-gray-50 p-3 rounded-lg">
                 <p className="font-semibold text-sm">
-                  {vehicleToDelete.year} {vehicleToDelete.make} {vehicleToDelete.model}
+                  {vehicleToDelete.year} {vehicleToDelete.make}{" "}
+                  {vehicleToDelete.model}
                 </p>
-                <p className="text-xs text-gray-500">License Plate: {vehicleToDelete.licensePlate}</p>
-                <p className="text-xs text-gray-500">VIN: {vehicleToDelete.vin}</p>
+                <p className="text-xs text-gray-500">
+                  License Plate: {vehicleToDelete.licensePlate}
+                </p>
+                <p className="text-xs text-gray-500">
+                  VIN: {vehicleToDelete.vin}
+                </p>
               </div>
             )}
             <div className="flex justify-end gap-2">
@@ -365,11 +422,13 @@ export default function FleetPage() {
                   setDeleteConfirmOpen(false);
                   setVehicleToDelete(null);
                 }}
-                disabled={isDeleting}
-              >
+                disabled={isDeleting}>
                 Cancel
               </Button>
-              <Button variant="destructive" onClick={handleDeleteVehicle} disabled={isDeleting}>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteVehicle}
+                disabled={isDeleting}>
                 {isDeleting ? (
                   <>
                     <AiOutlineLoading3Quarters className="mr-2 h-4 w-4 animate-spin" />

@@ -3,7 +3,7 @@ import { z } from "zod";
 const additionalServicesOptions = [
   "Coast Fuel Savings",
   "Discount Tire Telematics by Motorq",
-  "Revvo Smart Tire",
+  // "Revvo Smart Tire",
   "Roadside Assistance by NSD",
   "Spiffy Mobile Oil Change Service",
 ] as const;
@@ -39,9 +39,12 @@ export const createFleetUserZodSchema = z.object({
     centralLocation: z.boolean({
       required_error: "Central location status is required",
     }),
-    fleetProgram: z.enum(["Fleet Sales Specialist", "Store", "Website", "Other"], {
-      required_error: "Fleet program is required",
-    }),
+    fleetProgram: z.enum(
+      ["Fleet Sales Specialist", "Store", "Website", "Other"],
+      {
+        required_error: "Fleet program is required",
+      }
+    ),
     preferredLocation: z.boolean({
       required_error: "Preferred location status is required",
     }),
