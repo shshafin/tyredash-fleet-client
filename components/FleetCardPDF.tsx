@@ -20,7 +20,6 @@ interface User {
   numberOfVehicles: string;
   fleetProgram: string;
   additionalServices: string[];
-  isVerified: boolean;
   isAdminApproved: boolean;
 }
 
@@ -103,7 +102,7 @@ export const FleetCardPDF: React.FC<FleetCardPDFProps> = ({ user }) => {
           {/* QR Code */}
           <div className="absolute right-4 bottom-4 bg-white p-1 rounded">
             <QRCode
-              value={user.accountNumber}
+              value="https://fleet.tiresdash.com/"
               size={48}
             />
           </div>
