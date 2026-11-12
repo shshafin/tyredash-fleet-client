@@ -1,47 +1,57 @@
 import { NextResponse, NextRequest } from "next/server";
 import { jwtDecode } from "jwt-decode";
 
-const AuthRoutes = ["/login", "/register", "/change-password", "/forgot-password", "/reset-password"];
+const AuthRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+];
 
 export function middleware(request: NextRequest) {
-  const accessToken = request.cookies.get("accessToken"); // Fixed variable name
-  const pathname = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
+  const accessToken = request.cookies.get("accessToken")?.value;
 
-  console.log("Pathname:", pathname);
-  console.log("Access Token exists:", !!accessToken);
+  console.log(
+    `📡 [Middleware] Path: ${pathname} | Token: ${
+      accessToken ? "Present" : "Missing"
+    }`
+  );
 
+  // ১. যদি টোকেন না থাকে
   if (!accessToken) {
-    console.log("No access token found");
     if (AuthRoutes.includes(pathname)) {
       return NextResponse.next();
-    } else {
-      return NextResponse.redirect(new URL("/login", request.url));
     }
+    // প্রটেক্টেড রুটে যাওয়ার চেষ্টা করলে লগইনে পাঠাও
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  // ২. যদি টোকেন থাকে এবং ইউজার আবার লগইন/রেজিস্টার পেজে যেতে চায়
+  if (AuthRoutes.includes(pathname)) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   try {
-    const user: { role: string } | null = jwtDecode(accessToken.value);
-    console.log("Decoded user:", user);
-    console.log("User role:", user?.role);
+    const user: any = jwtDecode(accessToken);
+    console.log(`👤 User Role: ${user?.role}`);
 
+    // ৩. রোল চেক (Fleet User না হলে এক্সেস নেই)
     if (user?.role !== "fleet_user") {
-      console.log("Invalid role, redirecting to login");
-      if (AuthRoutes.includes(pathname)) {
-        return NextResponse.next();
-      } else {
-        return NextResponse.redirect(new URL("/login", request.url));
-      }
+      console.error("❌ Invalid Role: Redirecting to login & clearing cookie");
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      // ভুল রোল হলে কুকিটা ডিলিট করে দেওয়া ভালো যাতে লুপ না হয়
+      response.cookies.delete("accessToken");
+      return response;
     }
 
-    console.log("Valid user, allowing access");
+    // ৪. সব ঠিক থাকলে যেতে দাও
     return NextResponse.next();
   } catch (error) {
-    console.log("JWT decode error:", error);
-    if (AuthRoutes.includes(pathname)) {
-      return NextResponse.next();
-    } else {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+    console.error("🕵️ JWT Decode Error:", error);
+    const response = NextResponse.redirect(new URL("/login", request.url));
+    response.cookies.delete("accessToken");
+    return response;
   }
 }
 
